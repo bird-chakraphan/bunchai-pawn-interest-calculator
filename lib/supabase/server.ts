@@ -18,7 +18,13 @@ export async function createServerSupabaseClient() {
             },
             setAll(cookiesToSet) {
                 cookiesToSet.forEach(({ name, value, options }) => {
-                    cookieStore.set(name, value, options)
+                    try {
+                        cookieStore.set(name, value, options)
+                    } catch {
+                        // Server Components can read cookies but may not always be
+                        // allowed to mutate them. Middleware and Server Actions
+                        // handle the writable session updates for us.
+                    }
                 })
             },
         },
