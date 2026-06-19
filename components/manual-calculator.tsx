@@ -17,6 +17,22 @@ interface OptionEntry {
     warning?: string
 }
 
+interface PrefilledRecord {
+    pawnId: string
+    startDate: string
+    loanAmount: number
+    promoType: PromoType
+}
+
+interface ManualCalculatorProps {
+    title?: React.ReactNode
+    titleAction?: React.ReactNode
+    headerAction?: React.ReactNode
+    topAction?: React.ReactNode
+    notice?: React.ReactNode
+    prefilledRecord?: PrefilledRecord | null
+}
+
 const PROMO_OPTIONS: Array<{ label: string; value: PromoType }> = [
     { label: "โปร 2%", value: "โปร 2%" },
     { label: "โปรแสน", value: "โปรแสน (1.5%)" },
@@ -412,7 +428,7 @@ function ResultRow(props: {
     )
 }
 
-export function ManualCalculator() {
+export function ManualCalculator(props: ManualCalculatorProps) {
     const [currentDate, setCurrentDate] = React.useState(() => getToday())
     const [startDateInput, setStartDateInput] = React.useState("")
     const [loanInput, setLoanInput] = React.useState("")
@@ -428,6 +444,7 @@ export function ManualCalculator() {
     const [datePickerDraft, setDatePickerDraft] = React.useState(() => getToday())
     const datePickerRef = React.useRef<HTMLDivElement | null>(null)
     const loanInputRef = React.useRef<HTMLInputElement | null>(null)
+    const isPrefilled = Boolean(props.prefilledRecord)
 
     const startDate = React.useMemo(
         () => parseDateInput(startDateInput),
@@ -453,6 +470,16 @@ export function ManualCalculator() {
 
         return () => window.clearInterval(timer)
     }, [])
+
+    React.useEffect(() => {
+        if (!props.prefilledRecord) {
+            return
+        }
+
+        setStartDateInput(props.prefilledRecord.startDate)
+        setLoanInput(formatBaht(props.prefilledRecord.loanAmount))
+        setPromoType(props.prefilledRecord.promoType)
+    }, [props.prefilledRecord])
 
     React.useEffect(() => {
         if (!isDatePickerOpen) return
@@ -567,247 +594,275 @@ export function ManualCalculator() {
     return (
         <main className="phase-page">
             <section className="pawn-calculator-app">
-                <header className="pawn-header">
-                    <h1>คำนวณดอกเบี้ยจำนำ</h1>
+                {props.topAction ? <div className="pawn-top-action">{props.topAction}</div> : null}
+
+                <header className="pawn-header pawn-header-with-actions">
+                    <div className="pawn-title-row">
+                        <h1>{props.title ?? "คำนวณดอกเบี้ยจำนำ"}</h1>
+                        {props.titleAction}
+                    </div>
+                    {props.headerAction ? (
+                        <div className="pawn-header-action">{props.headerAction}</div>
+                    ) : null}
                 </header>
+
+                {props.notice ? <div className="pawn-page-notice">{props.notice}</div> : null}
 
                 <div className="pawn-layout">
                     <div className="pawn-card pawn-form-card">
                         <div className="pawn-field-row">
-                            <label htmlFor="pawn-start-date">
+                            <label htmlFor={isPrefilled ? undefined : "pawn-start-date"}>
                                 {renderResponsiveSlashLabel("วันเริ่ม / ต่อดอกล่าสุด")}
                             </label>
-                            <div
-                                className={`pawn-date-picker ${isDatePickerOpen ? "is-open" : ""}`}
-                                ref={datePickerRef}
-                            >
-                                <button
-                                    id="pawn-start-date"
-                                    className="pawn-date-trigger"
-                                    type="button"
-                                    aria-haspopup="dialog"
-                                    aria-expanded={isDatePickerOpen}
-                                    aria-label="วันเริ่ม / ต่อดอกล่าสุด"
-                                    onClick={() =>
-                                        isDatePickerOpen ? setIsDatePickerOpen(false) : openDatePicker()
-                                    }
+                            {isPrefilled ? (
+                                <div className="pawn-control pawn-control-readonly">
+                                    {startDate ? formatDate(startDate) : "-"}
+                                </div>
+                            ) : (
+                                <div
+                                    className={`pawn-date-picker ${isDatePickerOpen ? "is-open" : ""}`}
+                                    ref={datePickerRef}
                                 >
-                                    <span
-                                        className={
-                                            startDateInput
-                                                ? "pawn-date-value"
-                                                : "pawn-date-value is-placeholder"
+                                    <button
+                                        id="pawn-start-date"
+                                        className="pawn-date-trigger"
+                                        type="button"
+                                        aria-haspopup="dialog"
+                                        aria-expanded={isDatePickerOpen}
+                                        aria-label="วันเริ่ม / ต่อดอกล่าสุด"
+                                        onClick={() =>
+                                            isDatePickerOpen ? setIsDatePickerOpen(false) : openDatePicker()
                                         }
                                     >
-                                        {startDate ? formatDate(startDate) : "วัน / เดือน / ปี"}
-                                    </span>
-                                    <span className="pawn-calendar-icon" aria-hidden>
-                                        <svg
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
+                                        <span
+                                            className={
+                                                startDateInput
+                                                    ? "pawn-date-value"
+                                                    : "pawn-date-value is-placeholder"
+                                            }
                                         >
-                                            <path
-                                                d="M7 3.75V6.25M17 3.75V6.25M4.75 9.25H19.25M6.5 5H17.5C18.6046 5 19.5 5.89543 19.5 7V17.5C19.5 18.6046 18.6046 19.5 17.5 19.5H6.5C5.39543 19.5 4.5 18.6046 4.5 17.5V7C4.5 5.89543 5.39543 5 6.5 5Z"
-                                                stroke="currentColor"
-                                                strokeWidth="1.8"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
-                                    </span>
-                                </button>
+                                            {startDate ? formatDate(startDate) : "วัน / เดือน / ปี"}
+                                        </span>
+                                        <span className="pawn-calendar-icon" aria-hidden>
+                                            <svg
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                            >
+                                                <path
+                                                    d="M7 3.75V6.25M17 3.75V6.25M4.75 9.25H19.25M6.5 5H17.5C18.6046 5 19.5 5.89543 19.5 7V17.5C19.5 18.6046 18.6046 19.5 17.5 19.5H6.5C5.39543 19.5 4.5 18.6046 4.5 17.5V7C4.5 5.89543 5.39543 5 6.5 5Z"
+                                                    stroke="currentColor"
+                                                    strokeWidth="1.8"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                />
+                                            </svg>
+                                        </span>
+                                    </button>
 
-                                {isDatePickerOpen ? (
-                                    <div className="pawn-date-popover" role="dialog" aria-label="เลือกวันเริ่ม">
-                                        <div className="pawn-date-step-header">
-                                            {datePickerStep !== "year" ? (
-                                                <button
-                                                    className="pawn-date-back-button"
-                                                    type="button"
-                                                    aria-label="ย้อนกลับ"
-                                                    onClick={() =>
-                                                        setDatePickerStep(
-                                                            datePickerStep === "day" ? "month" : "year"
-                                                        )
-                                                    }
-                                                >
-                                                    ‹
-                                                </button>
-                                            ) : (
+                                    {isDatePickerOpen ? (
+                                        <div className="pawn-date-popover" role="dialog" aria-label="เลือกวันเริ่ม">
+                                            <div className="pawn-date-step-header">
+                                                {datePickerStep !== "year" ? (
+                                                    <button
+                                                        className="pawn-date-back-button"
+                                                        type="button"
+                                                        aria-label="ย้อนกลับ"
+                                                        onClick={() =>
+                                                            setDatePickerStep(
+                                                                datePickerStep === "day" ? "month" : "year"
+                                                            )
+                                                        }
+                                                    >
+                                                        ‹
+                                                    </button>
+                                                ) : (
+                                                    <span aria-hidden />
+                                                )}
+                                                <span className="pawn-date-step-value">
+                                                    {datePickerStep === "year"
+                                                        ? "เลือกปี"
+                                                        : datePickerStep === "month"
+                                                          ? `ปี ${formatBuddhistYear(datePickerDraft.getFullYear())}`
+                                                          : formatMonthYear(datePickerDraft)}
+                                                </span>
                                                 <span aria-hidden />
-                                            )}
-                                            <span className="pawn-date-step-value">
-                                                {datePickerStep === "year"
-                                                    ? "เลือกปี"
-                                                    : datePickerStep === "month"
-                                                      ? `ปี ${formatBuddhistYear(datePickerDraft.getFullYear())}`
-                                                      : formatMonthYear(datePickerDraft)}
-                                            </span>
-                                            <span aria-hidden />
-                                        </div>
-
-                                        {datePickerStep === "year" ? (
-                                            <div className="pawn-date-panel">
-                                                <div className="pawn-date-year-options">
-                                                    {datePickerYears.map((year) => (
-                                                        <button
-                                                            key={year}
-                                                            type="button"
-                                                            className={
-                                                                datePickerDraft.getFullYear() === year
-                                                                    ? "is-selected"
-                                                                    : ""
-                                                            }
-                                                            disabled={year > currentDate.getFullYear()}
-                                                            onClick={() => {
-                                                                setDatePickerDraft((previousDate) =>
-                                                                    clampDateToToday(
-                                                                        createSafeDate(
-                                                                            year,
-                                                                            previousDate.getMonth(),
-                                                                            previousDate.getDate()
-                                                                        ),
-                                                                        currentDate
-                                                                    )
-                                                                )
-                                                                setDatePickerStep("month")
-                                                            }}
-                                                        >
-                                                            {formatBuddhistYear(year)}
-                                                        </button>
-                                                    ))}
-                                                </div>
                                             </div>
-                                        ) : null}
 
-                                        {datePickerStep === "month" ? (
-                                            <div className="pawn-date-panel">
-                                                <div className="pawn-date-month-options">
-                                                    {THAI_MONTH_LABELS.map((monthLabel, monthIndex) => {
-                                                        const monthStart = new Date(
-                                                            datePickerDraft.getFullYear(),
-                                                            monthIndex,
-                                                            1
-                                                        )
-
-                                                        return (
+                                            {datePickerStep === "year" ? (
+                                                <div className="pawn-date-panel">
+                                                    <div className="pawn-date-year-options">
+                                                        {datePickerYears.map((year) => (
                                                             <button
-                                                                key={monthLabel}
+                                                                key={year}
                                                                 type="button"
                                                                 className={
-                                                                    datePickerDraft.getMonth() === monthIndex
+                                                                    datePickerDraft.getFullYear() === year
                                                                         ? "is-selected"
                                                                         : ""
                                                                 }
-                                                                disabled={compareDates(monthStart, currentDate) > 0}
+                                                                disabled={year > currentDate.getFullYear()}
                                                                 onClick={() => {
                                                                     setDatePickerDraft((previousDate) =>
                                                                         clampDateToToday(
                                                                             createSafeDate(
-                                                                                previousDate.getFullYear(),
-                                                                                monthIndex,
+                                                                                year,
+                                                                                previousDate.getMonth(),
                                                                                 previousDate.getDate()
                                                                             ),
                                                                             currentDate
                                                                         )
                                                                     )
-                                                                    setDatePickerStep("day")
+                                                                    setDatePickerStep("month")
                                                                 }}
                                                             >
-                                                                {monthLabel}
+                                                                {formatBuddhistYear(year)}
                                                             </button>
-                                                        )
-                                                    })}
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ) : null}
+                                            ) : null}
 
-                                        {datePickerStep === "day" ? (
-                                            <div className="pawn-date-panel">
-                                                <div className="pawn-date-day-options">
-                                                    {Array.from({ length: datePickerDayCount }, (_, index) => {
-                                                        const day = index + 1
-                                                        const optionDate = createSafeDate(
-                                                            datePickerDraft.getFullYear(),
-                                                            datePickerDraft.getMonth(),
-                                                            day
-                                                        )
+                                            {datePickerStep === "month" ? (
+                                                <div className="pawn-date-panel">
+                                                    <div className="pawn-date-month-options">
+                                                        {THAI_MONTH_LABELS.map((monthLabel, monthIndex) => {
+                                                            const monthStart = new Date(
+                                                                datePickerDraft.getFullYear(),
+                                                                monthIndex,
+                                                                1
+                                                            )
 
-                                                        return (
-                                                            <button
-                                                                key={day}
-                                                                type="button"
-                                                                className={
-                                                                    datePickerDraft.getDate() === day
-                                                                        ? "is-selected"
-                                                                        : ""
-                                                                }
-                                                                disabled={compareDates(optionDate, currentDate) > 0}
-                                                                onClick={() => {
-                                                                    updateStartDate(optionDate)
-                                                                    setDatePickerDraft(
-                                                                        clampDateToToday(optionDate, currentDate)
-                                                                    )
-                                                                    setIsDatePickerOpen(false)
-                                                                    loanInputRef.current?.focus()
-                                                                }}
-                                                            >
-                                                                {day}
-                                                            </button>
-                                                        )
-                                                    })}
+                                                            return (
+                                                                <button
+                                                                    key={monthLabel}
+                                                                    type="button"
+                                                                    className={
+                                                                        datePickerDraft.getMonth() === monthIndex
+                                                                            ? "is-selected"
+                                                                            : ""
+                                                                    }
+                                                                    disabled={compareDates(monthStart, currentDate) > 0}
+                                                                    onClick={() => {
+                                                                        setDatePickerDraft((previousDate) =>
+                                                                            clampDateToToday(
+                                                                                createSafeDate(
+                                                                                    previousDate.getFullYear(),
+                                                                                    monthIndex,
+                                                                                    previousDate.getDate()
+                                                                                ),
+                                                                                currentDate
+                                                                            )
+                                                                        )
+                                                                        setDatePickerStep("day")
+                                                                    }}
+                                                                >
+                                                                    {monthLabel}
+                                                                </button>
+                                                            )
+                                                        })}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ) : null}
-                                    </div>
-                                ) : null}
-                            </div>
+                                            ) : null}
+
+                                            {datePickerStep === "day" ? (
+                                                <div className="pawn-date-panel">
+                                                    <div className="pawn-date-day-options">
+                                                        {Array.from({ length: datePickerDayCount }, (_, index) => {
+                                                            const day = index + 1
+                                                            const optionDate = createSafeDate(
+                                                                datePickerDraft.getFullYear(),
+                                                                datePickerDraft.getMonth(),
+                                                                day
+                                                            )
+
+                                                            return (
+                                                                <button
+                                                                    key={day}
+                                                                    type="button"
+                                                                    className={
+                                                                        datePickerDraft.getDate() === day
+                                                                            ? "is-selected"
+                                                                            : ""
+                                                                    }
+                                                                    disabled={compareDates(optionDate, currentDate) > 0}
+                                                                    onClick={() => {
+                                                                        updateStartDate(optionDate)
+                                                                        setDatePickerDraft(
+                                                                            clampDateToToday(optionDate, currentDate)
+                                                                        )
+                                                                        setIsDatePickerOpen(false)
+                                                                        loanInputRef.current?.focus()
+                                                                    }}
+                                                                >
+                                                                    {day}
+                                                                </button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            )}
                         </div>
 
                         <div className="pawn-field-row">
-                            <label htmlFor="loanAmount">
+                            <label htmlFor={isPrefilled ? undefined : "loanAmount"}>
                                 <span>ยอดจำนำ</span>
                             </label>
-                            <div className="pawn-money-input">
-                                <input
-                                    ref={loanInputRef}
-                                    id="loanAmount"
-                                    className="pawn-control"
-                                    name="loanAmount"
-                                    type="tel"
-                                    inputMode="numeric"
-                                    pattern="[0-9]*"
-                                    autoComplete="off"
-                                    placeholder="กรอกยอดจำนำ"
-                                    value={loanInput}
-                                    onChange={handleLoanChange}
-                                />
-                                <span>บาท</span>
-                            </div>
+                            {isPrefilled ? (
+                                <div className="pawn-control pawn-control-readonly">
+                                    {loanInput ? `${loanInput} บาท` : "-"}
+                                </div>
+                            ) : (
+                                <div className="pawn-money-input">
+                                    <input
+                                        ref={loanInputRef}
+                                        id="loanAmount"
+                                        className="pawn-control"
+                                        name="loanAmount"
+                                        type="tel"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        autoComplete="off"
+                                        placeholder="กรอกยอดจำนำ"
+                                        value={loanInput}
+                                        onChange={handleLoanChange}
+                                    />
+                                    <span>บาท</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="pawn-field-row">
                             <label>
                                 <span>โปรโมชัน</span>
                             </label>
-                            <div className="pawn-segmented" role="radiogroup" aria-label="โปรโมชัน">
-                                {PROMO_OPTIONS.map((option) => {
-                                    const isSelected = promoType === option.value
-                                    return (
-                                        <button
-                                            key={option.value}
-                                            type="button"
-                                            role="radio"
-                                            aria-checked={isSelected}
-                                            className={isSelected ? "is-selected" : ""}
-                                            onClick={() => setPromoType(option.value)}
-                                        >
-                                            {option.label}
-                                        </button>
-                                    )
-                                })}
-                            </div>
+                            {isPrefilled ? (
+                                <div className="pawn-control pawn-control-readonly">
+                                    {PROMO_OPTIONS.find((option) => option.value === promoType)?.label ?? promoType}
+                                </div>
+                            ) : (
+                                <div className="pawn-segmented" role="radiogroup" aria-label="โปรโมชัน">
+                                    {PROMO_OPTIONS.map((option) => {
+                                        const isSelected = promoType === option.value
+                                        return (
+                                            <button
+                                                key={option.value}
+                                                type="button"
+                                                role="radio"
+                                                aria-checked={isSelected}
+                                                className={isSelected ? "is-selected" : ""}
+                                                onClick={() => setPromoType(option.value)}
+                                            >
+                                                {option.label}
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                            )}
                         </div>
 
                         <div className="pawn-field-row pawn-field-row-last">

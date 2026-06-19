@@ -12,6 +12,8 @@ create table if not exists public.pawn_records (
     updated_at timestamptz not null default now()
 );
 
+alter table public.pawn_records enable row level security;
+
 create index if not exists pawn_records_pawn_id_idx
     on public.pawn_records (pawn_id);
 
@@ -27,6 +29,8 @@ create table if not exists public.staff_profiles (
     updated_at timestamptz not null default now()
 );
 
+alter table public.staff_profiles enable row level security;
+
 create table if not exists public.sync_runs (
     id uuid primary key default gen_random_uuid(),
     status text not null,
@@ -39,3 +43,19 @@ create table if not exists public.sync_runs (
     warning_count integer not null default 0,
     error_message text
 );
+
+alter table public.sync_runs enable row level security;
+
+drop policy if exists "Authenticated users can read pawn_records" on public.pawn_records;
+create policy "Authenticated users can read pawn_records"
+    on public.pawn_records
+    for select
+    to authenticated
+    using (true);
+
+drop policy if exists "Authenticated users can read their own staff profile" on public.staff_profiles;
+create policy "Authenticated users can read their own staff profile"
+    on public.staff_profiles
+    for select
+    to authenticated
+    using (auth.uid() = id);

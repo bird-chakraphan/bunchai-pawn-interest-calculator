@@ -5,11 +5,36 @@ interface PawnRecordRow {
     pawn_id: string
     customer_phone: string | null
     start_date: string
-    loan_amount: number
+    loan_amount: number | string
     promo_type: PawnRecord["promoType"]
     archived_from_source: boolean
     source_updated_at: string | null
     last_synced_at: string | null
+}
+
+function normalizeLoanAmount(value: number | string): number {
+    const parsedValue =
+        typeof value === "number" ? value : Number.parseFloat(value)
+
+    if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
+        throw new Error("Invalid loan_amount value returned from pawn_records")
+    }
+
+    return parsedValue
+}
+
+function normalizeOptionalTimestamp(value: string | null): string | null {
+    if (!value) {
+        return null
+    }
+
+    const parsedDate = new Date(value)
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return null
+    }
+
+    return parsedDate.toISOString()
 }
 
 function mapPawnRecordRow(row: PawnRecordRow): PawnRecord {
@@ -17,11 +42,11 @@ function mapPawnRecordRow(row: PawnRecordRow): PawnRecord {
         pawnId: row.pawn_id,
         customerPhone: row.customer_phone,
         startDate: row.start_date,
-        loanAmount: row.loan_amount,
+        loanAmount: normalizeLoanAmount(row.loan_amount),
         promoType: row.promo_type,
         archivedFromSource: row.archived_from_source,
-        sourceUpdatedAt: row.source_updated_at,
-        lastSyncedAt: row.last_synced_at,
+        sourceUpdatedAt: normalizeOptionalTimestamp(row.source_updated_at),
+        lastSyncedAt: normalizeOptionalTimestamp(row.last_synced_at),
     }
 }
 

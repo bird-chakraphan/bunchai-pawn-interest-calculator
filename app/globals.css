@@ -48,12 +48,42 @@ select {
     margin-bottom: 18px;
 }
 
+.pawn-top-action {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.pawn-header-with-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.pawn-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+}
+
 .pawn-header h1 {
     margin: 0;
     color: var(--pawn-accent);
     font-size: calc(var(--pawn-font-size) * 2.3);
     font-weight: 760;
     line-height: 1.12;
+}
+
+.pawn-header-action {
+    flex: 0 1 520px;
+    width: 100%;
+}
+
+.pawn-page-notice {
+    margin-bottom: 16px;
 }
 
 .pawn-layout {
@@ -137,6 +167,14 @@ select {
 
 .pawn-control::placeholder {
     color: rgba(255, 245, 223, 0.48);
+}
+
+.pawn-control-readonly {
+    display: flex;
+    align-items: center;
+    color: var(--pawn-accent);
+    font-weight: 650;
+    cursor: default;
 }
 
 .pawn-control:hover {
@@ -651,6 +689,27 @@ select {
     cursor: pointer;
 }
 
+.staff-inline-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid rgba(245, 199, 75, 0.24);
+    border-radius: calc(var(--pawn-radius) * 0.42);
+    color: var(--pawn-accent);
+    text-decoration: none;
+    font-size: calc(var(--pawn-font-size) * 0.86);
+    line-height: 1;
+}
+
+.staff-header-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    width: 100%;
+}
+
 .staff-mode-switch a,
 .staff-secondary-button {
     border: 1px solid rgba(245, 199, 75, 0.24);
@@ -808,13 +867,18 @@ select {
         grid-template-columns: 1fr;
     }
 
-    .staff-header {
+    .staff-header,
+    .pawn-header-with-actions {
         align-items: flex-start;
         flex-direction: column;
     }
 
     .staff-mode-switch {
         width: 100%;
+    }
+
+    .staff-header-search {
+        grid-template-columns: 1fr;
     }
 
     .pawn-result-row {

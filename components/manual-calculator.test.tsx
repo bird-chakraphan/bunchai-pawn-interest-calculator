@@ -37,4 +37,24 @@ describe("ManualCalculator", () => {
         expect(screen.getByText("กรุณาเลือกวันเริ่ม")).toBeInTheDocument()
         expect(screen.getByText("กรุณากรอกยอดจำนำ")).toBeInTheDocument()
     })
+
+    it("renders locked prefilled fields for staff lookup mode", async () => {
+        render(
+            <ManualCalculator
+                prefilledRecord={{
+                    pawnId: "P-1001",
+                    startDate: "2024-06-10",
+                    loanAmount: 10000,
+                    promoType: "โปร 2%",
+                }}
+                title="คำนวณดอกเบี้ยจำนำ รหัส P-1001"
+            />
+        )
+
+        expect(screen.getByRole("heading", { name: "คำนวณดอกเบี้ยจำนำ รหัส P-1001" })).toBeInTheDocument()
+        expect(screen.getByText("10 มิ.ย. 2567")).toBeInTheDocument()
+        expect(screen.getByText("10,000 บาท")).toBeInTheDocument()
+        expect(screen.getAllByText("โปร 2%").length).toBeGreaterThan(0)
+        expect(screen.getByText("ดอกเบี้ยที่ต้องชำระในการต่อดอก")).toBeInTheDocument()
+    })
 })
