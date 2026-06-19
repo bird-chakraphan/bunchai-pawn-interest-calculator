@@ -621,6 +621,156 @@ select {
     flex: 0 0 8px;
 }
 
+.staff-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.staff-mode-switch {
+    display: inline-grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.staff-mode-switch a,
+.staff-primary-button,
+.staff-secondary-button {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: calc(var(--pawn-radius) * 0.42);
+    text-decoration: none;
+    font-size: calc(var(--pawn-font-size) * 0.86);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.staff-mode-switch a,
+.staff-secondary-button {
+    border: 1px solid rgba(245, 199, 75, 0.24);
+    background: var(--pawn-field);
+    color: var(--pawn-text);
+}
+
+.staff-mode-switch a.is-active,
+.staff-primary-button {
+    border: 1px solid rgba(255, 244, 192, 0.58);
+    background: linear-gradient(180deg, #f7d764, var(--pawn-accent));
+    color: #5d1b08;
+}
+
+.staff-auth-card,
+.staff-lookup-card,
+.staff-record-card,
+.staff-calculation-card {
+    padding: 20px 24px;
+}
+
+.staff-auth-copy,
+.staff-empty-copy,
+.staff-calculation-card p,
+.staff-record-grid dd {
+    margin: 0;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.86);
+    line-height: 1.5;
+}
+
+.staff-auth-form,
+.staff-lookup-form {
+    display: grid;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.staff-auth-field {
+    display: grid;
+    gap: 6px;
+}
+
+.staff-auth-field span,
+.staff-record-grid dt,
+.staff-record-card h2,
+.staff-calculation-card h2 {
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.78);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.staff-secondary-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+}
+
+.staff-auth-message {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border: 1px solid rgba(245, 199, 75, 0.18);
+    border-radius: calc(var(--pawn-radius) * 0.42);
+    background: rgba(255, 245, 223, 0.05);
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    line-height: 1.45;
+}
+
+.staff-auth-message.is-warning {
+    border-color: rgba(255, 220, 160, 0.28);
+}
+
+.staff-auth-message.is-error {
+    border-color: rgba(255, 170, 170, 0.32);
+}
+
+.staff-results-stack {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.staff-record-card h2,
+.staff-calculation-card h2 {
+    margin: 0 0 12px;
+}
+
+.staff-record-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 18px;
+    margin: 0;
+}
+
+.staff-record-grid div {
+    min-width: 0;
+}
+
+.staff-record-grid dd {
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+}
+
+.staff-calculation-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.staff-calculation-amount {
+    margin-bottom: 10px !important;
+    color: var(--pawn-accent) !important;
+    font-size: calc(var(--pawn-font-size) * 1.5) !important;
+    font-weight: 760;
+    line-height: 1.15 !important;
+}
+
 @keyframes pawnFadeIn {
     from {
         opacity: 0;
@@ -650,6 +800,21 @@ select {
 
     .pawn-result-main strong {
         font-size: calc(var(--pawn-font-size) * 1.8);
+    }
+
+    .staff-header,
+    .staff-calculation-grid,
+    .staff-record-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .staff-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .staff-mode-switch {
+        width: 100%;
     }
 
     .pawn-result-row {
