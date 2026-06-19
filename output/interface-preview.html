@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PawnInterestCalculator Preview</title>
+<style>
+html, body { margin: 0; min-height: 100%; background: #760608; }
+body { padding: 40px; font-family: Inter, "Noto Sans Thai", "IBM Plex Sans Thai", system-ui, sans-serif; }
+.preview-shell { width: min(100%, 920px); margin: 0 auto; }
+
+.pawn-calculator,
+.pawn-calculator * {
+    box-sizing: border-box;
+}
+
+.pawn-calculator {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: 100%;
+    min-height: 480px;
+    padding: 0;
+    overflow: auto;
+    color: var(--pawn-text);
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    font-family: Inter, "Noto Sans Thai", "IBM Plex Sans Thai", system-ui, sans-serif;
+    font-size: var(--pawn-font-size);
+}
+
+.pawn-responsive-frame {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.pawn-date-picker-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(20, 5, 2, 0.42);
+    border-radius: calc(var(--pawn-radius) * 0.72);
+    pointer-events: none;
+}
+
+.pawn-header {
+    margin-bottom: calc(var(--pawn-spacing) * 0.78);
+}
+
+.pawn-header h2,
+.pawn-header p {
+    margin: 0;
+}
+
+.pawn-header h2 {
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 1.72);
+    line-height: 1.15;
+    font-weight: 760;
+    letter-spacing: 0;
+}
+
+.pawn-header p {
+    max-width: 720px;
+    margin-top: 8px;
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    line-height: 1.45;
+}
+
+.pawn-layout {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    min-width: 0;
+    gap: calc(var(--pawn-spacing) * 0.78);
+    align-items: stretch;
+}
+
+.pawn-card {
+    min-width: 0;
+    background: var(--pawn-card);
+    border: 1px solid rgba(245, 199, 75, 0.52);
+    border-radius: calc(var(--pawn-radius) * 0.72);
+    box-shadow: 0 12px 26px rgba(40, 0, 0, 0.18);
+}
+
+.pawn-form-card {
+    flex: 1 1 300px;
+    min-width: min(100%, 360px);
+    padding: calc(var(--pawn-spacing) * 0.42) var(--pawn-spacing);
+}
+
+.pawn-field-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    min-width: 0;
+    padding: calc(var(--pawn-spacing) * 0.58) 0;
+    border-bottom: 1px solid rgba(245, 199, 75, 0.15);
+}
+
+.pawn-field-row-last {
+    border-bottom: 0;
+}
+
+.pawn-field-row label {
+    flex: 0.42 1 180px;
+    min-width: 0;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.pawn-field-row label span,
+.pawn-field-row label small {
+    display: block;
+}
+
+.pawn-field-row label .pawn-start-date-part {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.pawn-field-row > :not(label) {
+    flex: 1 1 230px;
+    min-width: min(100%, 230px);
+}
+
+.pawn-field-row label small {
+    margin-top: 5px;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.72);
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.pawn-control {
+    width: 100%;
+    min-width: 0;
+    height: 46px;
+    appearance: none;
+    border: 1px solid rgba(245, 199, 75, 0.18);
+    border-radius: calc(var(--pawn-radius) * 0.42);
+    outline: none;
+    background: var(--pawn-field);
+    color: var(--pawn-text);
+    padding: 0 14px;
+    font: inherit;
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease;
+}
+
+.pawn-control::placeholder {
+    color: rgba(255, 245, 223, 0.48);
+}
+
+.pawn-control:hover {
+    border-color: rgba(245, 199, 75, 0.42);
+}
+
+.pawn-control:focus {
+    border-color: var(--pawn-accent);
+    box-shadow: 0 0 0 3px rgba(245, 199, 75, 0.16);
+}
+
+.pawn-date-picker {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    z-index: 4;
+}
+
+.pawn-date-picker.is-open {
+    z-index: 30;
+}
+
+.pawn-date-trigger {
+    appearance: none;
+    display: flex;
+    width: 100%;
+    height: 46px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+    border: 1px solid rgba(245, 199, 75, 0.18);
+    border-radius: calc(var(--pawn-radius) * 0.42);
+    background: var(--pawn-field);
+    color: var(--pawn-text);
+    padding: 0 14px;
+    font: inherit;
+    text-align: left;
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease;
+}
+
+.pawn-date-trigger:hover,
+.pawn-date-trigger:focus-visible,
+.pawn-date-picker.is-open .pawn-date-trigger {
+    outline: none;
+    border-color: var(--pawn-accent);
+    box-shadow: 0 0 0 3px rgba(245, 199, 75, 0.12);
+}
+
+.pawn-date-value {
+    min-width: 0;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    line-height: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pawn-date-value.is-placeholder {
+    color: rgba(255, 245, 223, 0.48);
+}
+
+.pawn-calendar-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    color: var(--pawn-accent);
+}
+
+.pawn-calendar-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.pawn-date-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 40;
+    width: 100%;
+    max-width: 100%;
+    color: var(--pawn-text);
+    background: #6a1909;
+    border: 1px solid rgba(245, 199, 75, 0.42);
+    border-radius: calc(var(--pawn-radius) * 0.56);
+    box-shadow: 0 18px 34px rgba(28, 0, 0, 0.34);
+    padding: 12px;
+    animation: pawnFadeIn 150ms ease both;
+}
+
+.pawn-date-step-header {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 30px;
+    align-items: center;
+    gap: 8px;
+}
+
+.pawn-date-step-value {
+    min-width: 0;
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-weight: 760;
+    line-height: 1.25;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pawn-date-back-button {
+    appearance: none;
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: 1px solid rgba(245, 199, 75, 0.22);
+    border-radius: 999px;
+    background: rgba(255, 245, 223, 0.07);
+    color: var(--pawn-text);
+    font: inherit;
+    font-size: calc(var(--pawn-font-size) * 1.25);
+    font-weight: 760;
+    line-height: 1;
+}
+
+.pawn-date-panel {
+    display: grid;
+    gap: 11px;
+    margin-top: 11px;
+}
+
+.pawn-date-day-options,
+.pawn-date-month-options,
+.pawn-date-year-options {
+    display: grid;
+    gap: 6px;
+}
+
+.pawn-date-day-options {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.pawn-date-month-options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.pawn-date-year-options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-height: 102px;
+    overflow: auto;
+    padding-right: 2px;
+}
+
+.pawn-date-day-options button,
+.pawn-date-month-options button,
+.pawn-date-year-options button {
+    appearance: none;
+    min-width: 0;
+    height: 30px;
+    cursor: pointer;
+    border: 1px solid rgba(245, 199, 75, 0.16);
+    border-radius: calc(var(--pawn-radius) * 0.28);
+    background: rgba(73, 18, 7, 0.74);
+    color: var(--pawn-text);
+    font: inherit;
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-weight: 650;
+    line-height: 1;
+    transition:
+        border-color 160ms ease,
+        background-color 160ms ease,
+        color 160ms ease;
+}
+
+.pawn-date-day-options button:hover:not(:disabled),
+.pawn-date-month-options button:hover:not(:disabled),
+.pawn-date-year-options button:hover:not(:disabled) {
+    border-color: rgba(245, 199, 75, 0.45);
+}
+
+.pawn-date-day-options button.is-selected,
+.pawn-date-month-options button.is-selected,
+.pawn-date-year-options button.is-selected {
+    color: #5d1b08;
+    background: linear-gradient(180deg, #f7d764, var(--pawn-accent));
+    border-color: rgba(255, 244, 192, 0.58);
+}
+
+.pawn-date-day-options button:disabled,
+.pawn-date-month-options button:disabled,
+.pawn-date-year-options button:disabled {
+    cursor: not-allowed;
+    opacity: 0.34;
+}
+
+.pawn-select {
+    cursor: pointer;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--pawn-accent) 50%),
+        linear-gradient(135deg, var(--pawn-accent) 50%, transparent 50%);
+    background-position:
+        calc(100% - 18px) 20px,
+        calc(100% - 12px) 20px;
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 38px;
+}
+
+.pawn-money-input {
+    position: relative;
+    min-width: 0;
+}
+
+.pawn-money-input .pawn-control {
+    padding-right: 54px;
+}
+
+.pawn-money-input span {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--pawn-muted);
+    pointer-events: none;
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-weight: 650;
+}
+
+.pawn-segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    min-width: 0;
+}
+
+.pawn-segmented button {
+    appearance: none;
+    border: 0;
+    font: inherit;
+    letter-spacing: 0;
+}
+
+.pawn-segmented button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    height: 46px;
+    cursor: pointer;
+    color: var(--pawn-text);
+    background: var(--pawn-field);
+    border: 1px solid rgba(245, 199, 75, 0.18);
+    border-radius: calc(var(--pawn-radius) * 0.42);
+    padding: 0 10px;
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-weight: 760;
+    line-height: 1;
+    text-align: center;
+    transition:
+        transform 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease;
+}
+
+.pawn-segmented button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(245, 199, 75, 0.4);
+}
+
+.pawn-segmented button.is-selected {
+    color: #5d1b08;
+    background: linear-gradient(180deg, #f7d764, var(--pawn-accent));
+    border-color: rgba(255, 244, 192, 0.58);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.pawn-result-wrap {
+    display: flex;
+    flex: 1 1 260px;
+    min-width: min(100%, 260px);
+    flex-direction: column;
+    gap: 9px;
+}
+
+.pawn-result-card {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    padding: calc(var(--pawn-spacing) * 0.74) var(--pawn-spacing);
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.pawn-result-card.is-warning {
+    border-color: rgba(255, 189, 128, 0.72);
+    box-shadow:
+        0 12px 26px rgba(40, 0, 0, 0.22),
+        inset 0 0 0 1px rgba(255, 230, 180, 0.08);
+}
+
+.pawn-result-content,
+.pawn-empty-state,
+.pawn-loading,
+.pawn-warning-content {
+    width: 100%;
+    min-width: 0;
+    animation: pawnFadeIn 180ms ease both;
+}
+
+.pawn-result-main {
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(245, 199, 75, 0.18);
+}
+
+.pawn-result-main span {
+    display: block;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    line-height: 1.3;
+}
+
+.pawn-result-main strong {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 7px;
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 2);
+    font-weight: 820;
+    line-height: 1.02;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+}
+
+.pawn-result-main em {
+    color: var(--pawn-text);
+    font-style: normal;
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-weight: 760;
+}
+
+.pawn-result-grid {
+    display: grid;
+    gap: 20px;
+    padding-top: 13px;
+}
+
+.pawn-result-note {
+    color: var(--pawn-accent);
+    background: rgba(255, 220, 160, 0.08);
+    border: 1px solid rgba(255, 220, 160, 0.18);
+    border-radius: calc(var(--pawn-radius) * 0.34);
+    padding: 10px 12px;
+    font-size: calc(var(--pawn-font-size) * 0.82);
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.pawn-result-row {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    gap: 12px;
+    align-items: baseline;
+    min-width: 0;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    line-height: 1.35;
+}
+
+.pawn-result-row > span:first-child {
+    white-space: nowrap;
+}
+
+.pawn-result-row > span:last-child {
+    min-width: 0;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    font-weight: 400;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.pawn-result-row > span:last-child.is-highlight {
+    color: var(--pawn-text);
+}
+
+.pawn-weekly-addition {
+    display: block;
+    margin-top: 2px;
+}
+
+.pawn-empty-state,
+.pawn-loading,
+.pawn-warning-content {
+    display: flex;
+    min-height: 228px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.pawn-empty-state strong,
+.pawn-loading span,
+.pawn-warning-content strong {
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 1);
+    line-height: 1.35;
+}
+
+.pawn-validation-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.pawn-validation-list span {
+    color: var(--pawn-muted);
+    background: rgba(255, 245, 223, 0.06);
+    border: 1px solid rgba(245, 199, 75, 0.12);
+    border-radius: 999px;
+    padding: 5px 9px;
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    line-height: 1.2;
+}
+
+.pawn-loading span {
+    position: relative;
+    animation: pawnPulse 900ms ease-in-out infinite;
+}
+
+.pawn-warning-content {
+    align-items: flex-start;
+    min-height: 228px;
+    text-align: left;
+}
+
+.pawn-warning-kicker {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 12px;
+    color: var(--pawn-accent);
+    background: rgba(255, 220, 160, 0.08);
+    border: 1px solid rgba(255, 220, 160, 0.2);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    font-weight: 760;
+}
+
+.pawn-warning-content strong {
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 1.56);
+    font-weight: 820;
+}
+
+.pawn-warning-content p {
+    margin: 8px 0 0;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.92);
+    line-height: 1.45;
+}
+
+.pawn-today-text {
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    line-height: 1.35;
+    text-align: right;
+    opacity: 0.88;
+}
+
+@keyframes pawnFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pawnPulse {
+    0%,
+    100% {
+        opacity: 0.58;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pawn-result-content,
+    .pawn-empty-state,
+    .pawn-loading,
+    .pawn-warning-content,
+    .pawn-loading span,
+    .pawn-segmented button {
+        animation: none;
+        transition: none;
+    }
+}
+
+@media (max-width: 420px) {
+    .pawn-form-card,
+    .pawn-result-card {
+        padding: calc(var(--pawn-spacing) * 0.58);
+    }
+
+    .pawn-header h2 {
+        font-size: calc(var(--pawn-font-size) * 1.45);
+    }
+
+    .pawn-result-main strong {
+        font-size: calc(var(--pawn-font-size) * 1.8);
+    }
+
+    .pawn-result-row {
+        grid-template-columns: 1fr;
+        gap: 3px;
+    }
+
+    .pawn-result-row > span:last-child {
+        text-align: left;
+    }
+}
+
+</style>
+</head>
+<body>
+<div class="preview-shell">
+<section class="pawn-calculator" style="--pawn-bg:#760608;--pawn-card:#87090A;--pawn-field:#5B1D0C;--pawn-accent:#F3C94E;--pawn-text:#FFF7E6;--pawn-muted:#E8CBA2;--pawn-border:#D8AA34;--pawn-radius:18px;--pawn-font-size:18px;--pawn-spacing:24px;">
+  <div class="pawn-responsive-frame">
+    <div class="pawn-layout">
+      <div class="pawn-card pawn-form-card">
+        <div class="pawn-field-row">
+          <label for="pawn-start-date"><span><span class="pawn-start-date-part">วันเริ่ม</span> <span class="pawn-start-date-part">/ ต่อดอกล่าสุด</span></span></label>
+          <div class="pawn-date-picker"><button id="pawn-start-date" class="pawn-date-trigger" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="วันเริ่ม / ต่อดอกล่าสุด"><span class="pawn-date-value">9 พ.ค. 2569</span><span class="pawn-calendar-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 3.75V6.25M17 3.75V6.25M4.75 9.25H19.25M6.5 5H17.5C18.6046 5 19.5 5.89543 19.5 7V17.5C19.5 18.6046 18.6046 19.5 17.5 19.5H6.5C5.39543 19.5 4.5 18.6046 4.5 17.5V7C4.5 5.89543 5.39543 5 6.5 5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg></span></button></div>
+        </div>
+        <div class="pawn-field-row"><label for="pawn-loan-amount"><span>ยอดจำนำ</span></label><div class="pawn-money-input"><input id="pawn-loan-amount" class="pawn-control" type="tel" value="100,000" aria-label="ยอดจำนำ" /><span>บาท</span></div></div>
+        <div class="pawn-field-row"><label><span>โปรโมชัน</span></label><div class="pawn-segmented" role="radiogroup" aria-label="โปรโมชัน"><button type="button" role="radio" aria-checked="false">โปร 2%</button><button type="button" class="is-selected" role="radio" aria-checked="true">โปรแสน</button></div></div>
+        <div class="pawn-field-row pawn-field-row-last"><label><span>รายการ</span></label><div class="pawn-segmented" role="radiogroup" aria-label="รายการ"><button type="button" class="is-selected" role="radio" aria-checked="true">ต่อดอก</button><button type="button" role="radio" aria-checked="false">ไถ่ของ</button></div></div>
+      </div>
+      <div class="pawn-result-wrap">
+        <div class="pawn-card pawn-result-card"><div class="pawn-result-content"><div class="pawn-result-main"><span>ดอกเบี้ยที่ต้องชำระในการต่อดอก</span><strong>1,500<em>บาท</em></strong></div><div class="pawn-result-grid"><div class="pawn-result-note">ต่อดอก 1 เดือนถึงวันที่ 11 มิ.ย. 2569</div><div class="pawn-result-row"><span>ระยะเวลาทั้งสิ้น</span><span>0 เดือน 2 วัน</span></div><div class="pawn-result-row"><span>วิธีคิดดอก</span><span class="is-highlight">ปัดเต็มเดือน โปร 1.5%</span></div><div class="pawn-result-row"><span>คำนวน</span><span class="is-highlight">100,000 × 1.5% × 1 เดือน</span></div><div class="pawn-result-row"><span>สถานะสัญญา</span><span>ภายในระยะเวลา</span></div><div class="pawn-result-row"><span>สถานะไถ่ของ</span><span>สามารถไถ่ได้</span></div></div></div></div>
+        <div class="pawn-today-text">คำนวณตามวันที่วันนี้ วันที่ 13 พ.ค. 2569</div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+</body>
+</html>
