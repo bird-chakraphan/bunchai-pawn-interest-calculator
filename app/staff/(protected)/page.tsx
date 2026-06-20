@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ManualCalculator } from "@/components/manual-calculator"
 import { signOutAction } from "@/app/staff/sign-in/actions"
 import { getPawnRecordById } from "@/lib/pawn-records"
+import { buildStaffLookupViewModel } from "@/lib/staff-lookup"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 export const dynamic = "force-dynamic"
 
@@ -11,13 +12,21 @@ export default async function StaffHomePage(props: {
     const searchParams = await props.searchParams
     const pawnId = searchParams.pawnId?.trim() ?? ""
     const supabase = await createServerSupabaseClient()
+    const currentDate = new Date().toISOString().slice(0, 10)
 
     let lookupError: string | null = null
     let record = null
+    let staffLookupViewModel = null
 
     if (pawnId && supabase) {
         try {
             record = await getPawnRecordById({ supabase, pawnId })
+            if (record) {
+                staffLookupViewModel = buildStaffLookupViewModel({
+                    record,
+                    currentDate,
+                })
+            }
         } catch (error) {
             lookupError =
                 error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการค้นหาข้อมูล"
@@ -75,6 +84,7 @@ export default async function StaffHomePage(props: {
                       }
                     : null
             }
+            staffLookupViewModel={staffLookupViewModel}
         />
     )
 }

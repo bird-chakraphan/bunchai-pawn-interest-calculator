@@ -7,6 +7,7 @@ import {
     type PromoType,
     type TransactionType,
 } from "@/lib/pawn-interest"
+import type { StaffLookupViewModel } from "@/lib/staff-lookup"
 
 type DatePickerStep = "year" | "month" | "day"
 
@@ -31,6 +32,7 @@ interface ManualCalculatorProps {
     topAction?: React.ReactNode
     notice?: React.ReactNode
     prefilledRecord?: PrefilledRecord | null
+    staffLookupViewModel?: StaffLookupViewModel | null
 }
 
 const PROMO_OPTIONS: Array<{ label: string; value: PromoType }> = [
@@ -184,6 +186,23 @@ function formatBaht(value: number): string {
 function formatPercent(rate: number): string {
     const percent = rate * 100
     return `${Number.isInteger(percent) ? percent : percent.toFixed(1)}%`
+}
+
+function formatThaiDateTime(value: string | null): string {
+    if (!value) {
+        return "-"
+    }
+
+    const parsedDate = new Date(value)
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "-"
+    }
+
+    return new Intl.DateTimeFormat("th-TH", {
+        dateStyle: "medium",
+        timeStyle: "short",
+    }).format(parsedDate)
 }
 
 function getLoanAmountFromInput(value: string): number {
@@ -591,6 +610,18 @@ export function ManualCalculator(props: ManualCalculatorProps) {
         setPromoType(nextLoanAmount >= 100000 ? "โปรแสน (1.5%)" : "โปร 2%")
     }
 
+    const staffLookupViewModel = props.staffLookupViewModel ?? null
+    const showStaffLookupMeta = Boolean(isPrefilled && staffLookupViewModel)
+    const resolvedStaffLookupViewModel = showStaffLookupMeta ? staffLookupViewModel : null
+    const redeemSummaryAmount =
+        resolvedStaffLookupViewModel?.redeem.result.interestAmount !== null &&
+        resolvedStaffLookupViewModel?.redeem.result.interestAmount !== undefined
+            ? formatBaht(
+                  resolvedStaffLookupViewModel.record.loanAmount +
+                      resolvedStaffLookupViewModel.redeem.result.interestAmount
+              )
+            : null
+
     return (
         <main className="phase-page">
             <section className="pawn-calculator-app">
@@ -607,6 +638,49 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 </header>
 
                 {props.notice ? <div className="pawn-page-notice">{props.notice}</div> : null}
+
+                {resolvedStaffLookupViewModel ? (
+                    <>
+                        {resolvedStaffLookupViewModel.record.archivedFromSource ? (
+                            <div className="staff-auth-message is-warning">
+                                ระเบียนนี้ถูกทำเครื่องหมายเป็น <code>archived_from_source</code> จากการ sync ล่าสุด
+                            </div>
+                        ) : null}
+
+                        <div className="pawn-card staff-lookup-meta-card">
+                            <div className="staff-lookup-meta-grid">
+                                <div>
+                                    <span>Pawn ID</span>
+                                    <strong>{resolvedStaffLookupViewModel.record.pawnId}</strong>
+                                </div>
+                                <div>
+                                    <span>สถานะข้อมูล</span>
+                                    <strong>
+                                        {resolvedStaffLookupViewModel.record.archivedFromSource
+                                            ? "archived_from_source"
+                                            : "active"}
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span>sync ล่าสุด</span>
+                                    <strong>
+                                        {formatThaiDateTime(
+                                            resolvedStaffLookupViewModel.record.lastSyncedAt
+                                        )}
+                                    </strong>
+                                </div>
+                                <div>
+                                    <span>source ล่าสุด</span>
+                                    <strong>
+                                        {formatThaiDateTime(
+                                            resolvedStaffLookupViewModel.record.sourceUpdatedAt
+                                        )}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                ) : null}
 
                 <div className="pawn-layout">
                     <div className="pawn-card pawn-form-card">
@@ -979,6 +1053,45 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                         </div>
                     </div>
                 </div>
+
+                {resolvedStaffLookupViewModel ? (
+                    <section className="staff-dual-summary-section">
+                        <div className="staff-dual-summary-heading">
+                            สรุปทั้งสองรายการจากข้อมูลใบจำนำ
+                        </div>
+                        <div className="staff-dual-summary-grid">
+                            <div className="pawn-card staff-dual-summary-card">
+                                <span>ต่อดอก</span>
+                                <strong>
+                                    {formatBaht(
+                                        resolvedStaffLookupViewModel.extend.result.interestAmount ??
+                                            0
+                                    )}{" "}
+                                    บาท
+                                </strong>
+                                <p>{resolvedStaffLookupViewModel.extend.result.formulaText}</p>
+                                <p>{resolvedStaffLookupViewModel.extend.result.status}</p>
+                            </div>
+
+                            <div
+                                className={`pawn-card staff-dual-summary-card ${
+                                    resolvedStaffLookupViewModel.redeem.result.mode === "blocked"
+                                        ? "is-warning"
+                                        : ""
+                                }`}
+                            >
+                                <span>ไถ่ของ</span>
+                                <strong>
+                                    {redeemSummaryAmount
+                                        ? `${redeemSummaryAmount} บาท`
+                                        : "ไม่สามารถไถ่ได้"}
+                                </strong>
+                                <p>{resolvedStaffLookupViewModel.redeem.result.formulaText}</p>
+                                <p>{resolvedStaffLookupViewModel.redeem.result.status}</p>
+                            </div>
+                        </div>
+                    </section>
+                ) : null}
 
                 {result && optionEntries.length > 0 ? (
                     <section className="pawn-extend-options-section">
