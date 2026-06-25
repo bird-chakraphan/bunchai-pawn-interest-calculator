@@ -710,6 +710,23 @@ select {
     width: 100%;
 }
 
+.customer-header-search {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
+.staff-header-actions {
+    display: grid;
+    gap: 12px;
+    width: 100%;
+}
+
+.staff-title-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 .staff-lookup-meta-card {
     margin-bottom: 12px;
     padding: 16px 20px;
@@ -747,6 +764,10 @@ select {
 
 .staff-dual-summary-heading {
     margin-bottom: 10px;
+}
+
+.staff-dual-summary-action {
+    margin-top: 12px;
 }
 
 .staff-dual-summary-grid {
@@ -896,6 +917,248 @@ select {
     line-height: 1.15 !important;
 }
 
+.staff-sync-health-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.staff-sync-health-card,
+.staff-sync-health-table-card {
+    padding: 18px 20px;
+}
+
+.staff-sync-health-card span,
+.staff-sync-health-summary span,
+.staff-sync-issue-row span {
+    display: block;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.78);
+    line-height: 1.35;
+}
+
+.staff-sync-health-card strong,
+.staff-sync-health-summary strong,
+.staff-sync-issue-row strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.98);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.staff-sync-health-card strong {
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 1.2);
+}
+
+.staff-sync-health-table-card {
+    margin-top: 14px;
+}
+
+.staff-sync-health-table-card h2 {
+    margin: 0 0 12px;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.82);
+    font-weight: 600;
+}
+
+.staff-sync-health-summary,
+.staff-sync-issue-list {
+    display: grid;
+    gap: 12px;
+}
+
+.staff-sync-health-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.staff-sync-issue-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(245, 199, 75, 0.12);
+}
+
+.staff-sync-issue-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.staff-payment-section,
+.staff-payment-detail-card,
+.staff-payment-review-card,
+.payment-status-card {
+    padding: 20px 24px;
+}
+
+.staff-payment-section {
+    margin-top: 14px;
+}
+
+.staff-payment-section h2,
+.staff-payment-detail-card h2,
+.staff-payment-review-card h2,
+.payment-status-card h2 {
+    margin: 0 0 14px;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.9);
+    font-weight: 650;
+}
+
+.staff-payment-list {
+    display: grid;
+}
+
+.staff-payment-row {
+    display: grid;
+    grid-template-columns: 0.8fr 0.8fr 1fr 1.2fr;
+    gap: 16px;
+    padding: 16px 0;
+    border-top: 1px solid rgba(245, 199, 75, 0.14);
+    color: inherit;
+    text-decoration: none;
+}
+
+.staff-payment-row:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.staff-payment-row:last-child {
+    padding-bottom: 0;
+}
+
+.staff-payment-row:hover strong {
+    color: var(--pawn-accent);
+}
+
+.staff-payment-row span,
+.staff-payment-row small,
+.staff-payment-detail-list dt {
+    display: block;
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.75);
+    line-height: 1.4;
+}
+
+.staff-payment-row strong,
+.staff-payment-detail-list dd {
+    display: block;
+    margin: 4px 0 0;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.9);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.staff-payment-row small {
+    margin-top: 2px;
+}
+
+.staff-payment-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.staff-payment-detail-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+}
+
+.staff-payment-detail-list > div {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
+    gap: 14px;
+    padding: 11px 0;
+    border-top: 1px solid rgba(245, 199, 75, 0.12);
+}
+
+.staff-payment-detail-list > div:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.staff-payment-calculation-card,
+.staff-payment-review-card {
+    margin-top: 14px;
+}
+
+.staff-payment-calculation-card pre {
+    max-height: 340px;
+    margin: 0;
+    overflow: auto;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.72);
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.staff-payment-review-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.staff-payment-review-card p,
+.payment-status-note {
+    margin: 0;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.82);
+    line-height: 1.55;
+}
+
+.payment-status-shell {
+    width: min(100%, 680px);
+}
+
+.payment-status-card h2 {
+    margin-top: 12px;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 1.2);
+}
+
+.payment-status-badge {
+    display: inline-flex;
+    padding: 7px 10px;
+    border: 1px solid rgba(245, 199, 75, 0.26);
+    border-radius: calc(var(--pawn-radius) * 0.36);
+    color: var(--pawn-muted);
+    font-size: calc(var(--pawn-font-size) * 0.75);
+}
+
+.payment-status-badge.is-success {
+    border-color: rgba(151, 218, 142, 0.42);
+    color: #d8f6d3;
+}
+
+.payment-status-amount {
+    display: block;
+    margin-bottom: 18px;
+    color: var(--pawn-accent);
+    font-size: calc(var(--pawn-font-size) * 2);
+    line-height: 1.15;
+}
+
+.payment-status-note {
+    margin-top: 18px;
+    color: var(--pawn-muted);
+}
+
+.payment-status-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
 @keyframes pawnFadeIn {
     from {
         opacity: 0;
@@ -931,8 +1194,23 @@ select {
     .staff-calculation-grid,
     .staff-record-grid,
     .staff-lookup-meta-grid,
-    .staff-dual-summary-grid {
+    .staff-dual-summary-grid,
+    .staff-sync-health-grid,
+    .staff-sync-health-summary,
+    .staff-sync-issue-row,
+    .staff-payment-row,
+    .staff-payment-detail-grid {
         grid-template-columns: 1fr;
+    }
+
+    .staff-payment-detail-list > div {
+        grid-template-columns: 1fr;
+        gap: 2px;
+    }
+
+    .staff-payment-review-card {
+        align-items: stretch;
+        flex-direction: column;
     }
 
     .staff-header,

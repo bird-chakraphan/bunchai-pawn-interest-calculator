@@ -33,6 +33,8 @@ interface ManualCalculatorProps {
     notice?: React.ReactNode
     prefilledRecord?: PrefilledRecord | null
     staffLookupViewModel?: StaffLookupViewModel | null
+    showStaffLookupMetadata?: boolean
+    lookupAction?: React.ReactNode
 }
 
 const PROMO_OPTIONS: Array<{ label: string; value: PromoType }> = [
@@ -611,7 +613,9 @@ export function ManualCalculator(props: ManualCalculatorProps) {
     }
 
     const staffLookupViewModel = props.staffLookupViewModel ?? null
-    const showStaffLookupMeta = Boolean(isPrefilled && staffLookupViewModel)
+    const showStaffLookupMeta = Boolean(
+        isPrefilled && staffLookupViewModel && props.showStaffLookupMetadata
+    )
     const resolvedStaffLookupViewModel = showStaffLookupMeta ? staffLookupViewModel : null
     const redeemSummaryAmount =
         resolvedStaffLookupViewModel?.redeem.result.interestAmount !== null &&
@@ -1090,6 +1094,9 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                                 <p>{resolvedStaffLookupViewModel.redeem.result.status}</p>
                             </div>
                         </div>
+                        {props.lookupAction ? (
+                            <div className="staff-dual-summary-action">{props.lookupAction}</div>
+                        ) : null}
                     </section>
                 ) : null}
 

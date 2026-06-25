@@ -6,6 +6,7 @@ import {
 } from "@/lib/pawn-interest"
 
 export interface PawnRecord {
+    id: string
     pawnId: string
     startDate: string
     loanAmount: number

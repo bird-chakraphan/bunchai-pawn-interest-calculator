@@ -45,17 +45,25 @@ export default async function StaffHomePage(props: {
             }
             headerAction={
                 record ? null : (
-                    <form className="staff-header-search" action="/staff" method="get">
-                        <input
-                            className="pawn-control"
-                            name="pawnId"
-                            defaultValue={pawnId}
-                            placeholder="กรอกเลขใบจำนำเพื่อค้นหา"
-                        />
-                        <button className="staff-primary-button" type="submit">
-                            ค้นหา
-                        </button>
-                    </form>
+                    <div className="staff-header-actions">
+                        <form className="staff-header-search" action="/staff" method="get">
+                            <input
+                                className="pawn-control"
+                                name="pawnId"
+                                defaultValue={pawnId}
+                                placeholder="กรอกเลขใบจำนำเพื่อค้นหา"
+                            />
+                            <button className="staff-primary-button" type="submit">
+                                ค้นหา
+                            </button>
+                        </form>
+                        <Link className="staff-inline-action" href="/staff/sync-health">
+                            ดูสถานะ sync
+                        </Link>
+                        <Link className="staff-inline-action" href="/staff/payments">
+                            รายการชำระเงิน
+                        </Link>
+                    </div>
                 )
             }
             topAction={
@@ -85,6 +93,7 @@ export default async function StaffHomePage(props: {
                     : null
             }
             staffLookupViewModel={staffLookupViewModel}
+            showStaffLookupMetadata
         />
     )
 }

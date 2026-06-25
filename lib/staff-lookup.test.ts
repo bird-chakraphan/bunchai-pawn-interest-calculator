@@ -4,6 +4,7 @@ import { buildStaffLookupViewModel, type PawnRecord } from "@/lib/staff-lookup"
 describe("buildStaffLookupViewModel", () => {
     it("returns both extend and redeem calculations for a pawn record", () => {
         const record: PawnRecord = {
+            id: "record-1",
             pawnId: "P-1001",
             startDate: "2024-06-10",
             loanAmount: 10000,

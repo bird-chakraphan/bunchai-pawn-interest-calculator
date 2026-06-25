@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import type { PawnRecord } from "@/lib/staff-lookup"
 
 interface PawnRecordRow {
+    id: string
     pawn_id: string
     customer_phone: string | null
     start_date: string
@@ -39,6 +40,7 @@ function normalizeOptionalTimestamp(value: string | null): string | null {
 
 function mapPawnRecordRow(row: PawnRecordRow): PawnRecord {
     return {
+        id: row.id,
         pawnId: row.pawn_id,
         customerPhone: row.customer_phone,
         startDate: row.start_date,
@@ -57,7 +59,7 @@ export async function getPawnRecordById(params: {
     const { data, error } = await params.supabase
         .from("pawn_records")
         .select(
-            "pawn_id, customer_phone, start_date, loan_amount, promo_type, archived_from_source, source_updated_at, last_synced_at"
+            "id, pawn_id, customer_phone, start_date, loan_amount, promo_type, archived_from_source, source_updated_at, last_synced_at"
         )
         .eq("pawn_id", params.pawnId)
         .maybeSingle<PawnRecordRow>()

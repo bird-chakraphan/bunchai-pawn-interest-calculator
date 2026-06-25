@@ -49,6 +49,7 @@ describe("ManualCalculator", () => {
                 }}
                 staffLookupViewModel={{
                     record: {
+                        id: "record-1",
                         pawnId: "P-1001",
                         startDate: "2024-06-10",
                         loanAmount: 10000,
@@ -100,6 +101,7 @@ describe("ManualCalculator", () => {
                     },
                 }}
                 title="คำนวณดอกเบี้ยจำนำ รหัส P-1001"
+                showStaffLookupMetadata
             />
         )
 
@@ -126,6 +128,7 @@ describe("ManualCalculator", () => {
                 }}
                 staffLookupViewModel={{
                     record: {
+                        id: "record-2",
                         pawnId: "P-2001",
                         startDate: "2024-06-10",
                         loanAmount: 10000,
@@ -179,6 +182,7 @@ describe("ManualCalculator", () => {
                     },
                 }}
                 title="คำนวณดอกเบี้ยจำนำ รหัส P-2001"
+                showStaffLookupMetadata
             />
         )
 
