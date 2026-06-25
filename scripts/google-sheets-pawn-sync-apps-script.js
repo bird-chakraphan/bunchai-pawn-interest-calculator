@@ -8,8 +8,8 @@
  * 4. Set Script Properties:
  *    - APP_SYNC_ENDPOINT=https://your-domain.com/api/internal/sync/pawn-records
  *    - INTERNAL_SYNC_SECRET=<same value as the app env>
- *    - PROMO_COLUMN_LETTER=<column letter that stores โปร 2% / โปรแสน>
- *    - DEFAULT_PROMO_TYPE=<optional: โปร 2% or โปรแสน (1.5%)>
+ *    - PROMO_COLUMN_LETTER=<optional override; default is AL / Base Percentage>
+ *    - DEFAULT_PROMO_TYPE=<optional fallback; use only if Base Percentage is blank>
  * 5. Run installFiveMinuteTrigger once.
  *
  * This script intentionally sends the full current source dataset. The app
@@ -23,6 +23,7 @@ const CONFIG = {
     LOAN_ID_COLUMN: "A",
     LOAN_AMOUNT_COLUMN: "AK",
     CUSTOMER_ID_COLUMN_IN_LOAN_STOCK: "AM",
+    PROMO_COLUMN: "AL",
     LATEST_RENEWAL_DATE_COLUMN: "AP",
     CUSTOMER_ID_COLUMN_IN_CUSTOMER: "A",
     CUSTOMER_PHONE_COLUMN: "F",
@@ -44,7 +45,8 @@ function syncPawnRecords() {
     const properties = PropertiesService.getScriptProperties()
     const endpoint = requireScriptProperty_(properties, "APP_SYNC_ENDPOINT")
     const syncSecret = requireScriptProperty_(properties, "INTERNAL_SYNC_SECRET")
-    const promoColumnLetter = properties.getProperty("PROMO_COLUMN_LETTER")
+    const promoColumnLetter =
+        properties.getProperty("PROMO_COLUMN_LETTER") || CONFIG.PROMO_COLUMN
     const defaultPromoType = properties.getProperty("DEFAULT_PROMO_TYPE")
 
     const spreadsheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
@@ -209,17 +211,37 @@ function formatDateForApp_(value) {
 }
 
 function normalizePromoType_(value) {
-    const text = normalizeString_(value)
+    if (typeof value === "number") {
+        if (Math.abs(value - 0.02) < 0.000001 || Math.abs(value - 2) < 0.000001) {
+            return "โปร 2%"
+        }
 
-    if (text === "โปร 2%" || text === "2%" || text === "2") {
+        if (Math.abs(value - 0.015) < 0.000001 || Math.abs(value - 1.5) < 0.000001) {
+            return "โปรแสน (1.5%)"
+        }
+    }
+
+    const text = normalizeString_(value)
+    const normalizedText = text.replace(/\s+/g, "").replace("％", "%")
+
+    if (
+        text === "โปร 2%" ||
+        normalizedText === "โปร2%" ||
+        normalizedText === "2%" ||
+        normalizedText === "2" ||
+        normalizedText === "0.02"
+    ) {
         return "โปร 2%"
     }
 
     if (
         text === "โปรแสน" ||
         text === "โปรแสน (1.5%)" ||
-        text === "1.5%" ||
-        text === "1.5"
+        normalizedText === "โปรแสน" ||
+        normalizedText === "โปรแสน(1.5%)" ||
+        normalizedText === "1.5%" ||
+        normalizedText === "1.5" ||
+        normalizedText === "0.015"
     ) {
         return "โปรแสน (1.5%)"
     }

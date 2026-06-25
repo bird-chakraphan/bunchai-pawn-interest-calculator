@@ -20,10 +20,11 @@ Loan tab:
 | `startDate` | `Loan Stock!AP` / `Latest Renewal Date` |
 | customer join key | `Loan Stock!AM` / `Customer Name`, which is actually Customer ID |
 | `customerPhone` | join `Loan Stock!AM` to `Customer!A`, then use `Customer!F` / `Phone Number` |
-| `promoType` | needs the real promo/rate column, or an explicitly approved fallback |
+| `promoType` | `Loan Stock!AL` / `Base Percentage` |
 
 Important: `promoType` is required because the calculation can be `โปร 2%` or
-`โปรแสน (1.5%)`. Do not silently guess it for production data.
+`โปรแสน (1.5%)`. The sync script maps `2%`, `2`, or `0.02` to `โปร 2%`, and
+maps `1.5%`, `1.5`, or `0.015` to `โปรแสน (1.5%)`.
 
 ## Apps Script
 
@@ -39,8 +40,8 @@ Setup steps:
 5. Add:
    - `APP_SYNC_ENDPOINT`: `https://your-domain.com/api/internal/sync/pawn-records`
    - `INTERNAL_SYNC_SECRET`: same value as the app environment variable
-   - `PROMO_COLUMN_LETTER`: the column letter that stores the pawn promotion/rate
-   - `DEFAULT_PROMO_TYPE`: optional fallback, only if the business approves one
+   - `PROMO_COLUMN_LETTER`: optional override; default is `AL`
+   - `DEFAULT_PROMO_TYPE`: optional fallback, only if `Base Percentage` is blank
 6. Run `installFiveMinuteTrigger` once.
 7. Run `syncPawnRecords` once manually and confirm it returns `ok: true`.
 8. In the app, open `/staff/sync-health` and verify:
@@ -48,14 +49,15 @@ Setup steps:
    - invalid rows are separated from active rows
    - archived rows are visible if any old Pawn IDs disappeared from the sheet
 
-## Current Promotion Blocker
+## Real Sync Readiness
 
-The provided mapping does not include the promotion/rate column. Before this sync
-should be used for real customer-visible lookup, choose one:
+The source mapping is now complete for calculation:
 
-1. Provide the real promo/rate column from `Loan Stock`.
-2. Confirm that the app should derive promotion from amount, matching the old UI:
-   `loanAmount >= 100000` -> `โปรแสน (1.5%)`, otherwise `โปร 2%`.
-3. Confirm that all synced rows should use one fixed default promotion.
+- pawn ID
+- loan amount
+- latest renewal date
+- base percentage / promotion
+- customer phone through the Customer sheet join
 
-Option 1 is safest.
+Before enabling the 5-minute trigger in production, run `syncPawnRecords` once
+manually and review `/staff/sync-health` for invalid source rows.
