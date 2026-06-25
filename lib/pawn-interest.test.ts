@@ -131,4 +131,20 @@ describe("calculatePawnInterest", () => {
 
         expect(result.interestAmount).toBe(186)
     })
+
+    it("uses source base rate when provided instead of fixed promo mapping", () => {
+        const result = calculatePawnInterest({
+            startDate: "2026-04-10",
+            currentDate: "2026-05-10",
+            loanAmount: 10000,
+            promoType: "โปร 2%",
+            baseRate: 0.01,
+            transactionType: "ต่อดอก",
+        })
+
+        expect(result.rate).toBe(0.01)
+        expect(result.method).toBe("คิดเดือนจริง โปร 1%")
+        expect(result.interestAmount).toBe(100)
+        expect(result.formulaText).toBe("10,000 × 1% × 1 เดือน")
+    })
 })

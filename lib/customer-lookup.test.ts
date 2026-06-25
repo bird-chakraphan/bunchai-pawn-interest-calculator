@@ -11,6 +11,7 @@ const baseRecord: PawnRecord = {
     startDate: "2024-06-10",
     loanAmount: 10000,
     promoType: "โปร 2%",
+    baseRate: 0.02,
     customerPhone: "0812345678",
     archivedFromSource: false,
     sourceUpdatedAt: null,

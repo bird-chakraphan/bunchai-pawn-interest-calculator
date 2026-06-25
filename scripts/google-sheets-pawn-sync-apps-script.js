@@ -149,7 +149,10 @@ function buildPawnRows_(sheet, customerPhoneById, options) {
 
     return values.map((row, index) => {
         const customerId = normalizeString_(row[customerIdColumn - 1])
-        const rawPromo = promoColumn ? row[promoColumn - 1] : options.defaultPromoType
+        const rawBasePercentage = promoColumn
+            ? row[promoColumn - 1]
+            : options.defaultPromoType
+        const baseRate = parseBaseRate_(rawBasePercentage)
 
         return {
             rowIndex: CONFIG.FIRST_DATA_ROW + index,
@@ -157,7 +160,8 @@ function buildPawnRows_(sheet, customerPhoneById, options) {
             customerPhone: customerPhoneById.get(customerId) || null,
             startDate: formatDateForApp_(row[renewalDateColumn - 1]),
             loanAmount: parseLoanAmount_(row[amountColumn - 1]),
-            promoType: normalizePromoType_(rawPromo),
+            promoType: formatPromoLabel_(baseRate),
+            baseRate,
             sourceUpdatedAt: null,
         }
     })
@@ -210,41 +214,56 @@ function formatDateForApp_(value) {
     return text
 }
 
-function normalizePromoType_(value) {
+function parseBaseRate_(value) {
     if (typeof value === "number") {
-        if (Math.abs(value - 0.02) < 0.000001 || Math.abs(value - 2) < 0.000001) {
-            return "โปร 2%"
+        if (value > 0 && value <= 1) {
+            return value
         }
 
-        if (Math.abs(value - 0.015) < 0.000001 || Math.abs(value - 1.5) < 0.000001) {
-            return "โปรแสน (1.5%)"
+        if (value > 1) {
+            return value / 100
         }
     }
 
     const text = normalizeString_(value)
-    const normalizedText = text.replace(/\s+/g, "").replace("％", "%")
+    const normalizedText = text
+        .replace(/\s+/g, "")
+        .replace("％", "%")
+        .replace("%", "")
 
-    if (
-        text === "โปร 2%" ||
-        normalizedText === "โปร2%" ||
-        normalizedText === "2%" ||
-        normalizedText === "2" ||
-        normalizedText === "0.02"
-    ) {
-        return "โปร 2%"
+    if (text === "โปรแสน" || text === "โปรแสน (1.5%)") {
+        return 0.015
     }
 
-    if (
-        text === "โปรแสน" ||
-        text === "โปรแสน (1.5%)" ||
-        normalizedText === "โปรแสน" ||
-        normalizedText === "โปรแสน(1.5%)" ||
-        normalizedText === "1.5%" ||
-        normalizedText === "1.5" ||
-        normalizedText === "0.015"
-    ) {
-        return "โปรแสน (1.5%)"
+    if (text === "โปร 2%" || normalizedText === "โปร2") {
+        return 0.02
     }
 
-    return text
+    const promoLabelMatch = normalizedText.match(/^โปร(\d+(?:\.\d+)?)$/)
+
+    if (promoLabelMatch) {
+        const parsedPromoLabelRate = Number(promoLabelMatch[1])
+        return parsedPromoLabelRate / 100
+    }
+
+    const parsed = Number(normalizedText)
+
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+        return 0
+    }
+
+    return parsed <= 1 ? parsed : parsed / 100
+}
+
+function formatPromoLabel_(baseRate) {
+    if (!Number.isFinite(baseRate) || baseRate <= 0) {
+        return ""
+    }
+
+    const percent = baseRate * 100
+    const percentText = Number.isInteger(percent)
+        ? String(percent)
+        : String(Number(percent.toFixed(3))).replace(/0+$/, "").replace(/\.$/, "")
+
+    return `โปร ${percentText}%`
 }

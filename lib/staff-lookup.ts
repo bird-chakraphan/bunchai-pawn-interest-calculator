@@ -1,7 +1,6 @@
 import {
     calculatePawnInterest,
     type PawnInterestResult,
-    type PromoType,
     type TransactionType,
 } from "@/lib/pawn-interest"
 
@@ -10,7 +9,8 @@ export interface PawnRecord {
     pawnId: string
     startDate: string
     loanAmount: number
-    promoType: PromoType
+    promoType: string
+    baseRate: number
     customerPhone: string | null
     archivedFromSource: boolean
     sourceUpdatedAt: string | null
@@ -39,7 +39,11 @@ function buildCalculationEntry(params: {
             startDate: params.record.startDate,
             currentDate: params.currentDate,
             loanAmount: params.record.loanAmount,
-            promoType: params.record.promoType,
+            promoType:
+                params.record.promoType === "โปรแสน (1.5%)"
+                    ? "โปรแสน (1.5%)"
+                    : "โปร 2%",
+            baseRate: params.record.baseRate,
             transactionType: params.transactionType,
         }),
     }

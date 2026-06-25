@@ -2,14 +2,14 @@
 
 import * as React from "react"
 import { ManualCalculator } from "@/components/manual-calculator"
-import type { PromoType } from "@/lib/pawn-interest"
 import type { StaffLookupViewModel } from "@/lib/staff-lookup"
 
 interface PublicLookupRecord {
     pawnId: string
     startDate: string
     loanAmount: number
-    promoType: PromoType
+    promoType: string
+    baseRate: number
 }
 
 type LookupResultState =

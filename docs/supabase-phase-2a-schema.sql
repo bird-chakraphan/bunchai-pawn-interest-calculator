@@ -4,13 +4,31 @@ create table if not exists public.pawn_records (
     customer_phone text,
     start_date date not null,
     loan_amount numeric(12, 2) not null check (loan_amount > 0),
-    promo_type text not null check (promo_type in ('โปร 2%', 'โปรแสน (1.5%)')),
+    promo_type text not null,
+    base_rate numeric(8, 6) not null default 0.02 check (base_rate > 0),
     archived_from_source boolean not null default false,
     source_updated_at timestamptz,
     last_synced_at timestamptz,
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+alter table public.pawn_records
+    add column if not exists base_rate numeric(8, 6) not null default 0.02 check (base_rate > 0);
+
+alter table public.pawn_records
+    alter column promo_type type text;
+
+alter table public.pawn_records
+    drop constraint if exists pawn_records_promo_type_check;
+
+update public.pawn_records
+set base_rate = case
+    when promo_type in ('โปรแสน (1.5%)', 'โปร 1.5%') then 0.015
+    when promo_type = 'โปร 1%' then 0.01
+    else 0.02
+end
+where base_rate is null or base_rate = 0.02;
 
 alter table public.pawn_records enable row level security;
 

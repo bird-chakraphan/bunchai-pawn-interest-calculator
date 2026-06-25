@@ -14,7 +14,8 @@ describe("prepareSyncRows", () => {
                 customerPhone: "081-234-5678",
                 startDate: "2024-06-10",
                 loanAmount: 10000,
-                promoType: "โปร 2%",
+                promoType: "โปร 1%",
+                baseRate: 0.01,
                 sourceUpdatedAt: null,
             },
             {
@@ -24,6 +25,7 @@ describe("prepareSyncRows", () => {
                 startDate: "2024-06-11",
                 loanAmount: 12000,
                 promoType: "โปร 2%",
+                baseRate: 0.02,
                 sourceUpdatedAt: null,
             },
             {
@@ -33,6 +35,7 @@ describe("prepareSyncRows", () => {
                 startDate: "2024-06-10",
                 loanAmount: 10000,
                 promoType: "โปร 2%",
+                baseRate: 0.02,
                 sourceUpdatedAt: null,
             },
         ]
@@ -46,7 +49,8 @@ describe("prepareSyncRows", () => {
                 customerPhone: "0812345678",
                 startDate: "2024-06-10",
                 loanAmount: 10000,
-                promoType: "โปร 2%",
+                promoType: "โปร 1%",
+                baseRate: 0.01,
                 sourceUpdatedAt: null,
             },
         ])

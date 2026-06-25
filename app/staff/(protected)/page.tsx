@@ -89,6 +89,7 @@ export default async function StaffHomePage(props: {
                           startDate: record.startDate,
                           loanAmount: record.loanAmount,
                           promoType: record.promoType,
+                          baseRate: record.baseRate,
                       }
                     : null
             }

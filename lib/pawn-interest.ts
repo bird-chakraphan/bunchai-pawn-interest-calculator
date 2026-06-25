@@ -11,6 +11,7 @@ export interface PawnInterestInput {
     currentDate: string
     loanAmount: number
     promoType: PromoType
+    baseRate?: number
     transactionType: TransactionType
 }
 
@@ -136,6 +137,18 @@ function formatPercent(rate: number): string {
     return `${Number.isInteger(percent) ? percent : percent.toFixed(1)}%`
 }
 
+function resolvePromoRate(input: Pick<PawnInterestInput, "promoType" | "baseRate">): number {
+    if (input.baseRate !== undefined) {
+        if (!Number.isFinite(input.baseRate) || input.baseRate <= 0) {
+            throw new Error("baseRate must be greater than 0")
+        }
+
+        return input.baseRate
+    }
+
+    return PROMO_RATES[input.promoType]
+}
+
 function formatIntegerBaht(value: number): string {
     return new Intl.NumberFormat("th-TH", {
         maximumFractionDigits: 0,
@@ -155,12 +168,12 @@ function getContractStatus(overdueFromContractExpiry: number): string {
 }
 
 function determineInterestMode(params: {
-    promoType: PromoType
+    promoRate: number
     transactionType: TransactionType
     overdueFromLatestBoundary: number
     overdueFromContractExpiry: number
 }) {
-    const promoRate = PROMO_RATES[params.promoType]
+    const promoRate = params.promoRate
     const promoRateLabel = `${formatPercent(promoRate)} ต่อเดือน`
 
     if (
@@ -318,7 +331,7 @@ export function calculatePawnInterest(
             : 0
 
     const modeDetails = determineInterestMode({
-        promoType: input.promoType,
+        promoRate: resolvePromoRate(input),
         transactionType: input.transactionType,
         overdueFromLatestBoundary,
         overdueFromContractExpiry,
@@ -328,7 +341,7 @@ export function calculatePawnInterest(
         loanAmount: input.loanAmount,
         monthCount,
         actualMonthCount,
-        promoRate: PROMO_RATES[input.promoType],
+        promoRate: resolvePromoRate(input),
         mode: modeDetails.mode,
         rate: modeDetails.rate,
     })
@@ -351,7 +364,7 @@ export function calculatePawnInterest(
             loanAmount: input.loanAmount,
             monthCount,
             actualMonthCount,
-            promoRate: PROMO_RATES[input.promoType],
+            promoRate: resolvePromoRate(input),
             mode: modeDetails.mode,
             rate: modeDetails.rate,
         }),

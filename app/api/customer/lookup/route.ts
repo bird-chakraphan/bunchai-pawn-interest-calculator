@@ -112,6 +112,7 @@ export async function POST(request: NextRequest) {
             startDate: outcome.record.startDate,
             loanAmount: outcome.record.loanAmount,
             promoType: outcome.record.promoType,
+            baseRate: outcome.record.baseRate,
         },
         lookupViewModel: outcome.lookupViewModel,
     })

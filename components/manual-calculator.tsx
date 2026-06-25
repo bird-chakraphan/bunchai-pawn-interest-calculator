@@ -22,7 +22,8 @@ interface PrefilledRecord {
     pawnId: string
     startDate: string
     loanAmount: number
-    promoType: PromoType
+    promoType: string
+    baseRate: number
 }
 
 interface ManualCalculatorProps {
@@ -190,6 +191,10 @@ function formatPercent(rate: number): string {
     return `${Number.isInteger(percent) ? percent : percent.toFixed(1)}%`
 }
 
+function resolvePromoLabel(promoType: string, promoRate: number): string {
+    return promoType.trim() || `โปร ${formatPercent(promoRate)}`
+}
+
 function formatThaiDateTime(value: string | null): string {
     if (!value) {
         return "-"
@@ -241,9 +246,9 @@ function buildExtendOptionEntries(params: {
     startDate: Date
     result: PawnInterestResult
     loanAmount: number
-    promoType: PromoType
+    promoRate: number
 }): OptionEntry[] {
-    const promoRate = PROMO_RATES[params.promoType]
+    const promoRate = params.promoRate
     const promoLabel = `โปร ${formatPercent(promoRate)}`
     const latestBoundary = parseDateInput(params.result.latestBoundary)
     const contractExpiryDate = parseDateInput(params.result.contractExpiryDate)
@@ -328,9 +333,9 @@ function buildRedeemOptionEntries(params: {
     startDate: Date
     result: PawnInterestResult
     loanAmount: number
-    promoType: PromoType
+    promoRate: number
 }): OptionEntry[] {
-    const promoRate = PROMO_RATES[params.promoType]
+    const promoRate = params.promoRate
     const promoLabel = `โปร ${formatPercent(promoRate)}`
     const latestBoundary = parseDateInput(params.result.latestBoundary)
 
@@ -480,6 +485,10 @@ export function ManualCalculator(props: ManualCalculatorProps) {
         datePickerDraft.getFullYear(),
         datePickerDraft.getMonth()
     )
+    const activePromoRate = props.prefilledRecord?.baseRate ?? PROMO_RATES[promoType]
+    const activePromoLabel = props.prefilledRecord
+        ? resolvePromoLabel(props.prefilledRecord.promoType, activePromoRate)
+        : PROMO_OPTIONS.find((option) => option.value === promoType)?.label ?? promoType
 
     React.useEffect(() => {
         const timer = window.setInterval(() => {
@@ -499,7 +508,11 @@ export function ManualCalculator(props: ManualCalculatorProps) {
 
         setStartDateInput(props.prefilledRecord.startDate)
         setLoanInput(formatBaht(props.prefilledRecord.loanAmount))
-        setPromoType(props.prefilledRecord.promoType)
+        if (props.prefilledRecord.baseRate === 0.015) {
+            setPromoType("โปรแสน (1.5%)")
+        } else {
+            setPromoType("โปร 2%")
+        }
     }, [props.prefilledRecord])
 
     React.useEffect(() => {
@@ -555,6 +568,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                     currentDate: formatDateInputValue(currentDate),
                     loanAmount,
                     promoType,
+                    baseRate: props.prefilledRecord?.baseRate,
                     transactionType,
                 })
             )
@@ -564,7 +578,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการคำนวณ"
             )
         }
-    }, [currentDate, loanAmount, loanInput, promoType, startDate, startDateInput, transactionType])
+    }, [currentDate, loanAmount, loanInput, promoType, props.prefilledRecord?.baseRate, startDate, startDateInput, transactionType])
 
     const optionEntries = React.useMemo(() => {
         if (!startDate || !result) {
@@ -576,7 +590,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 startDate,
                 result,
                 loanAmount,
-                promoType,
+                promoRate: activePromoRate,
             })
         }
 
@@ -584,9 +598,9 @@ export function ManualCalculator(props: ManualCalculatorProps) {
             startDate,
             result,
             loanAmount,
-            promoType,
+            promoRate: activePromoRate,
         })
-    }, [loanAmount, promoType, result, startDate, transactionType])
+    }, [activePromoRate, loanAmount, result, startDate, transactionType])
 
     const totalRedeemAmount =
         transactionType === "ไถ่ของ" &&
@@ -920,7 +934,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                             </label>
                             {isPrefilled ? (
                                 <div className="pawn-control pawn-control-readonly">
-                                    {PROMO_OPTIONS.find((option) => option.value === promoType)?.label ?? promoType}
+                                    {activePromoLabel}
                                 </div>
                             ) : (
                                 <div className="pawn-segmented" role="radiogroup" aria-label="โปรโมชัน">

@@ -20,11 +20,12 @@ Loan tab:
 | `startDate` | `Loan Stock!AP` / `Latest Renewal Date` |
 | customer join key | `Loan Stock!AM` / `Customer Name`, which is actually Customer ID |
 | `customerPhone` | join `Loan Stock!AM` to `Customer!A`, then use `Customer!F` / `Phone Number` |
-| `promoType` | `Loan Stock!AL` / `Base Percentage` |
+| `baseRate` | `Loan Stock!AL` / `Base Percentage` |
+| `promoType` | display label derived from `Base Percentage`, such as `โปร 1%`, `โปร 1.5%`, or `โปร 2%` |
 
-Important: `promoType` is required because the calculation can be `โปร 2%` or
-`โปรแสน (1.5%)`. The sync script maps `2%`, `2`, or `0.02` to `โปร 2%`, and
-maps `1.5%`, `1.5`, or `0.015` to `โปรแสน (1.5%)`.
+Important: `Base Percentage` is the source of truth for calculation. The sync
+script stores it as `baseRate`, so source values like `1%`, `1.5%`, `2%`,
+`0.01`, `0.015`, and `0.02` are calculated directly.
 
 ## Apps Script
 

@@ -1,4 +1,3 @@
-import type { PromoType } from "@/lib/pawn-interest"
 import { normalizePhoneNumber } from "@/lib/phone"
 
 export interface IncomingSyncRow {
@@ -7,7 +6,8 @@ export interface IncomingSyncRow {
     customerPhone: string | null
     startDate: string
     loanAmount: number
-    promoType: PromoType
+    promoType: string
+    baseRate: number
     sourceUpdatedAt: string | null
 }
 
@@ -23,8 +23,6 @@ interface PrepareSyncRowsResult {
     validRows: IncomingSyncRow[]
     issues: SyncRunIssueInput[]
 }
-
-const VALID_PROMO_TYPES = new Set<PromoType>(["โปร 2%", "โปรแสน (1.5%)"])
 
 function isValidDateInput(value: string): boolean {
     const parsedDate = new Date(value)
@@ -58,8 +56,8 @@ function validateRow(row: IncomingSyncRow): SyncRunIssueInput | null {
         return toIssue(row, "Invalid loan amount")
     }
 
-    if (!VALID_PROMO_TYPES.has(row.promoType)) {
-        return toIssue(row, "Invalid promo type")
+    if (!Number.isFinite(row.baseRate) || row.baseRate <= 0) {
+        return toIssue(row, "Invalid base rate")
     }
 
     return null
