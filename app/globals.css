@@ -1,6 +1,7 @@
 :root {
     color-scheme: light;
-    font-family: Inter, "Noto Sans Thai", "IBM Plex Sans Thai", system-ui, sans-serif;
+    --pawn-font-family: var(--font-pawn-ui), system-ui, sans-serif;
+    font-family: var(--pawn-font-family);
     background: #760608;
     color: #fff7e6;
     --pawn-bg: #760608;
@@ -25,6 +26,8 @@ body {
 }
 
 body {
+    font-family: var(--pawn-font-family);
+    font-synthesis: none;
     background:
         radial-gradient(circle at top, rgba(170, 25, 18, 0.48), transparent 32%),
         var(--pawn-bg);
@@ -282,11 +285,18 @@ select {
 
 .pawn-date-step-value {
     min-width: 0;
-    color: var(--pawn-accent);
     font-size: calc(var(--pawn-font-size) * 0.92);
     font-weight: 400;
     line-height: 1.25;
     text-align: center;
+}
+
+.pawn-date-step-value.is-year-step {
+    color: var(--pawn-text);
+}
+
+.pawn-date-step-value.is-detail-step {
+    color: var(--pawn-accent);
 }
 
 .pawn-date-back-button {
@@ -336,12 +346,13 @@ select {
     appearance: none;
     min-width: 0;
     height: 36px;
+    padding: 1px 0;
     cursor: pointer;
     border: 1px solid rgba(245, 199, 75, 0.16);
     border-radius: calc(var(--pawn-radius) * 0.28);
     background: rgba(73, 18, 7, 0.74);
     color: var(--pawn-text);
-    font-size: calc(var(--pawn-font-size) * 0.92);
+    font-size: calc(var(--pawn-font-size) * 0.84);
     transition:
         border-color 160ms ease,
         background-color 160ms ease,

@@ -47,7 +47,7 @@ describe("PublicHomePage", () => {
 
         render(<PublicHomePage />)
 
-        fireEvent.click(screen.getByRole("button", { name: "กรอกข้อมูลเอง" }))
+        fireEvent.click(screen.getByRole("button", { name: "กรอกข้อมูล" }))
         fireEvent.change(screen.getByLabelText("ยอดจำนำ"), {
             target: { value: "120000" },
         })
@@ -74,7 +74,7 @@ describe("PublicHomePage", () => {
             ).toBeInTheDocument()
         })
 
-        fireEvent.click(screen.getByRole("button", { name: "กรอกข้อมูลเอง" }))
+        fireEvent.click(screen.getByRole("button", { name: "กรอกข้อมูล" }))
 
         expect(
             screen.getByRole("heading", { name: "คำนวณดอกเบี้ยจำนำ" })

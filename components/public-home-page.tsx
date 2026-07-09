@@ -204,7 +204,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
                 type="button"
                 onClick={() => handleModeChange("manual")}
             >
-                กรอกข้อมูลเอง
+                กรอกข้อมูล
             </button>
         </div>
     )

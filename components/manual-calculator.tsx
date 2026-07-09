@@ -790,7 +790,13 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                                                     ) : (
                                                         <span aria-hidden />
                                                     )}
-                                                    <span className="pawn-date-step-value">
+                                                    <span
+                                                        className={`pawn-date-step-value ${
+                                                            datePickerStep === "year"
+                                                                ? "is-year-step"
+                                                                : "is-detail-step"
+                                                        }`}
+                                                    >
                                                         {datePickerStep === "year"
                                                             ? "เลือกปี"
                                                             : datePickerStep === "month"
