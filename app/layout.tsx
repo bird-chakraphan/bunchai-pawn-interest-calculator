@@ -16,8 +16,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout(props: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="th">
-            <body className={notoSansThai.variable}>{props.children}</body>
+        <html lang="th" className={notoSansThai.variable}>
+            <body>{props.children}</body>
         </html>
     )
 }

@@ -1,6 +1,6 @@
 :root {
     color-scheme: light;
-    --pawn-font-family: var(--font-pawn-ui), system-ui, sans-serif;
+    --pawn-font-family: var(--font-pawn-ui, "Noto Sans Thai"), system-ui, sans-serif;
     font-family: var(--pawn-font-family);
     background: #760608;
     color: #fff7e6;
