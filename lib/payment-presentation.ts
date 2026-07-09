@@ -2,6 +2,8 @@ export type PaymentStatus = "pending_payment" | "paid" | "failed" | "expired"
 
 export type RenewalStatus = "none" | "pending_staff_review" | "review_completed"
 
+const THAI_TIME_ZONE = "Asia/Bangkok"
+
 const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
     pending_payment: "รอการชำระเงิน",
     paid: "ชำระเงินแล้ว",
@@ -43,6 +45,7 @@ export function formatThaiDateTime(value: string | null): string {
     return new Intl.DateTimeFormat("th-TH", {
         dateStyle: "medium",
         timeStyle: "short",
+        timeZone: THAI_TIME_ZONE,
     }).format(parsedDate)
 }
 
@@ -59,5 +62,6 @@ export function formatThaiDate(value: string | null): string {
 
     return new Intl.DateTimeFormat("th-TH", {
         dateStyle: "medium",
+        timeZone: THAI_TIME_ZONE,
     }).format(parsedDate)
 }

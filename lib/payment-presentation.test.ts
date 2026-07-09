@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
     formatBaht,
+    formatThaiDateTime,
     getPaymentStatusLabel,
     getRenewalStatusLabel,
 } from "@/lib/payment-presentation"
@@ -19,5 +20,9 @@ describe("payment presentation", () => {
 
     it("formats whole-baht payment amounts", () => {
         expect(formatBaht(1240)).toBe("1,240 บาท")
+    })
+
+    it("formats timestamps in Bangkok time for SSR pages", () => {
+        expect(formatThaiDateTime("2026-07-09T17:04:03.069+00:00")).toContain("10 ก.ค. 2569 00:04")
     })
 })

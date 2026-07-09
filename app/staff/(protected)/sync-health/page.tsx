@@ -1,20 +1,10 @@
 import Link from "next/link"
 import { signOutAction } from "@/app/staff/sign-in/actions"
+import { formatThaiDateTime } from "@/lib/payment-presentation"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
 import { getSyncHealthSnapshot } from "@/lib/sync-health"
 
 export const dynamic = "force-dynamic"
-
-function formatThaiDateTime(value: string | null): string {
-    if (!value) {
-        return "-"
-    }
-
-    return new Intl.DateTimeFormat("th-TH", {
-        dateStyle: "medium",
-        timeStyle: "short",
-    }).format(new Date(value))
-}
 
 export default async function StaffSyncHealthPage() {
     const supabase = createAdminSupabaseClient()
