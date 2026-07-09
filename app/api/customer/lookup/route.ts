@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     if (!pawnId || !phone) {
         return NextResponse.json(
-            { error: "Pawn ID and mobile number are required" },
+            { error: "กรุณากรอกเลขใบจำนำและเบอร์โทรศัพท์" },
             { status: 400 }
         )
     }

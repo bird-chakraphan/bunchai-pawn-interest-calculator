@@ -43,6 +43,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
         isLoading: false,
         error: null,
     })
+    const [calculatorResetVersion, setCalculatorResetVersion] = React.useState(0)
 
     async function handleLookupSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -106,7 +107,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
 
         setLookupResult({
             status: "generic_failure",
-            message: "ไม่สามารถยืนยันข้อมูลได้ กรุณาตรวจสอบเลขใบจำนำและเบอร์โทรศัพท์",
+            message: "ไม่พบข้อมูลในระบบ กรุณาตรวจสอบเลขใบจำนำและเบอร์โทรศัพท์",
         })
     }
 
@@ -118,6 +119,16 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
             isLoading: false,
             error: null,
         })
+    }
+
+    function handleModeChange(nextMode: "lookup" | "manual") {
+        if (nextMode === mode) {
+            return
+        }
+
+        clearLookup()
+        setCalculatorResetVersion((currentValue) => currentValue + 1)
+        setMode(nextMode)
     }
 
     async function handleExtendPayment() {
@@ -156,94 +167,112 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
 
     const isLookupMode = mode === "lookup"
     const successResult = lookupResult.status === "success" ? lookupResult : null
+    const hasLookupError =
+        lookupResult.status !== "success" &&
+        lookupResult.status !== "idle" &&
+        lookupResult.status !== "loading"
+    const notice =
+        hasLookupError || paymentState.error ? (
+            <>
+                {hasLookupError ? (
+                    <div
+                        className={`staff-auth-message ${
+                            lookupResult.status === "error" ? "is-error" : ""
+                        }`}
+                    >
+                        {lookupResult.message}
+                    </div>
+                ) : null}
+                {paymentState.error ? (
+                    <div className="staff-auth-message is-error">
+                        {paymentState.error}
+                    </div>
+                ) : null}
+            </>
+        ) : null
     const modeSwitch = (
         <div className="staff-mode-switch">
             <button
                 className={isLookupMode ? "staff-primary-button" : "staff-secondary-button"}
                 type="button"
-                onClick={() => setMode("lookup")}
+                onClick={() => handleModeChange("lookup")}
             >
-                ค้นหาด้วย Pawn ID
+                ค้นหาด้วยรหัส
             </button>
             <button
                 className={!isLookupMode ? "staff-primary-button" : "staff-secondary-button"}
                 type="button"
-                onClick={() => {
-                    setMode("manual")
-                    clearLookup()
-                }}
+                onClick={() => handleModeChange("manual")}
             >
                 กรอกข้อมูลเอง
             </button>
         </div>
     )
+    const titleAction = successResult ? (
+        <div className="public-title-actions">
+            <div className="pawn-card public-mode-switch-card">{modeSwitch}</div>
+            <button
+                className="staff-inline-action"
+                type="button"
+                onClick={clearLookup}
+            >
+                ล้างการค้นหา
+            </button>
+        </div>
+    ) : (
+        <div className="public-title-actions">
+            <div className="pawn-card public-mode-switch-card">{modeSwitch}</div>
+        </div>
+    )
 
     return (
         <ManualCalculator
+            resetVersion={calculatorResetVersion}
             title={
                 successResult
                     ? `คำนวณดอกเบี้ยจำนำ รหัส ${successResult.record.pawnId}`
                     : "คำนวณดอกเบี้ยจำนำ"
             }
-            titleAction={
-                successResult ? (
-                    <div className="staff-title-actions">
-                        {modeSwitch}
-                        <button
-                            className="staff-inline-action"
-                            type="button"
-                            onClick={clearLookup}
-                        >
-                            ล้างการค้นหา
-                        </button>
-                    </div>
-                ) : (
-                    modeSwitch
-                )
-            }
+            titleAction={titleAction}
             headerAction={
                 isLookupMode && !successResult ? (
-                    <form className="staff-header-search customer-header-search" onSubmit={handleLookupSubmit}>
-                        <input
-                            className="pawn-control"
-                            name="pawnId"
-                            placeholder="กรอกเลขใบจำนำ"
-                            value={pawnId}
-                            onChange={(event) => setPawnId(event.target.value)}
-                        />
-                        <input
-                            className="pawn-control"
-                            name="phone"
-                            placeholder="กรอกเบอร์โทรศัพท์"
-                            value={phone}
-                            onChange={(event) => setPhone(event.target.value)}
-                        />
-                        <button className="staff-primary-button" type="submit">
-                            {lookupResult.status === "loading" ? "กำลังค้นหา..." : "ค้นหา"}
-                        </button>
-                    </form>
+                    <div className="pawn-card public-lookup-search-card">
+                        <form className="public-lookup-form" onSubmit={handleLookupSubmit}>
+                            <div className="pawn-field-row">
+                                <label htmlFor="public-pawn-id">
+                                    <span>เลขใบจำนำ</span>
+                                </label>
+                                <input
+                                    id="public-pawn-id"
+                                    className="pawn-control"
+                                    name="pawnId"
+                                    placeholder="กรอกเลขใบจำนำ"
+                                    value={pawnId}
+                                    onChange={(event) => setPawnId(event.target.value)}
+                                />
+                            </div>
+                            <div className="pawn-field-row pawn-field-row-last">
+                                <label htmlFor="public-phone">
+                                    <span>เบอร์โทรศัพท์</span>
+                                </label>
+                                <input
+                                    id="public-phone"
+                                    className="pawn-control"
+                                    name="phone"
+                                    placeholder="กรอกเบอร์โทรศัพท์"
+                                    value={phone}
+                                    onChange={(event) => setPhone(event.target.value)}
+                                />
+                            </div>
+                            <button className="staff-primary-button public-lookup-submit" type="submit">
+                                {lookupResult.status === "loading" ? "กำลังค้นหา..." : "ค้นหา"}
+                            </button>
+                        </form>
+                    </div>
                 ) : null
             }
-            notice={
-                <>
-                    {lookupResult.status !== "success" &&
-                    lookupResult.status !== "idle" &&
-                    lookupResult.status !== "loading" ? (
-                        <div
-                            className={`staff-auth-message ${
-                                lookupResult.status === "error" ? "is-error" : ""
-                            }`}
-                        >
-                            {lookupResult.message}
-                        </div>
-                    ) : null}
-                    {paymentState.error ? (
-                        <div className="staff-auth-message is-error">
-                            {paymentState.error}
-                        </div>
-                    ) : null}
-                </>
-            }
+            hideCalculatorBody={isLookupMode && !successResult}
+            notice={notice}
             prefilledRecord={successResult?.record ?? null}
             staffLookupViewModel={successResult?.lookupViewModel ?? null}
             lookupAction={

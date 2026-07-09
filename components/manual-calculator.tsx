@@ -36,6 +36,8 @@ interface ManualCalculatorProps {
     staffLookupViewModel?: StaffLookupViewModel | null
     showStaffLookupMetadata?: boolean
     lookupAction?: React.ReactNode
+    hideCalculatorBody?: boolean
+    resetVersion?: number
 }
 
 const PROMO_OPTIONS: Array<{ label: string; value: PromoType }> = [
@@ -516,6 +518,22 @@ export function ManualCalculator(props: ManualCalculatorProps) {
     }, [props.prefilledRecord])
 
     React.useEffect(() => {
+        if (props.resetVersion === undefined) {
+            return
+        }
+
+        setStartDateInput("")
+        setLoanInput("")
+        setPromoType("โปร 2%")
+        setTransactionType("ต่อดอก")
+        setResult(null)
+        setEngineError(null)
+        setIsDatePickerOpen(false)
+        setDatePickerStep("year")
+        setDatePickerDraft(getToday())
+    }, [props.resetVersion])
+
+    React.useEffect(() => {
         if (!isDatePickerOpen) return
 
         const handlePointerDown = (event: MouseEvent | TouchEvent) => {
@@ -700,246 +718,257 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                     </>
                 ) : null}
 
-                <div className="pawn-layout">
-                    <div className="pawn-card pawn-form-card">
-                        <div className="pawn-field-row">
-                            <label htmlFor={isPrefilled ? undefined : "pawn-start-date"}>
-                                {renderResponsiveSlashLabel("วันเริ่ม / ต่อดอกล่าสุด")}
-                            </label>
-                            {isPrefilled ? (
-                                <div className="pawn-control pawn-control-readonly">
-                                    {startDate ? formatDate(startDate) : "-"}
-                                </div>
-                            ) : (
-                                <div
-                                    className={`pawn-date-picker ${isDatePickerOpen ? "is-open" : ""}`}
-                                    ref={datePickerRef}
-                                >
-                                    <button
-                                        id="pawn-start-date"
-                                        className="pawn-date-trigger"
-                                        type="button"
-                                        aria-haspopup="dialog"
-                                        aria-expanded={isDatePickerOpen}
-                                        aria-label="วันเริ่ม / ต่อดอกล่าสุด"
-                                        onClick={() =>
-                                            isDatePickerOpen ? setIsDatePickerOpen(false) : openDatePicker()
-                                        }
+                {!props.hideCalculatorBody ? (
+                    <div className="pawn-layout">
+                        <div className="pawn-card pawn-form-card">
+                            <div className="pawn-field-row">
+                                <label htmlFor={isPrefilled ? undefined : "pawn-start-date"}>
+                                    {renderResponsiveSlashLabel("วันเริ่ม / ต่อดอกล่าสุด")}
+                                </label>
+                                {isPrefilled ? (
+                                    <div className="pawn-control pawn-control-readonly">
+                                        {startDate ? formatDate(startDate) : "-"}
+                                    </div>
+                                ) : (
+                                    <div
+                                        className={`pawn-date-picker ${isDatePickerOpen ? "is-open" : ""}`}
+                                        ref={datePickerRef}
                                     >
-                                        <span
-                                            className={
-                                                startDateInput
-                                                    ? "pawn-date-value"
-                                                    : "pawn-date-value is-placeholder"
+                                        <button
+                                            id="pawn-start-date"
+                                            className="pawn-date-trigger"
+                                            type="button"
+                                            aria-haspopup="dialog"
+                                            aria-expanded={isDatePickerOpen}
+                                            aria-label="วันเริ่ม / ต่อดอกล่าสุด"
+                                            onClick={() =>
+                                                isDatePickerOpen ? setIsDatePickerOpen(false) : openDatePicker()
                                             }
                                         >
-                                            {startDate ? formatDate(startDate) : "วัน / เดือน / ปี"}
-                                        </span>
-                                        <span className="pawn-calendar-icon" aria-hidden>
-                                            <svg
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
+                                            <span
+                                                className={
+                                                    startDateInput
+                                                        ? "pawn-date-value"
+                                                        : "pawn-date-value is-placeholder"
+                                                }
                                             >
-                                                <path
-                                                    d="M7 3.75V6.25M17 3.75V6.25M4.75 9.25H19.25M6.5 5H17.5C18.6046 5 19.5 5.89543 19.5 7V17.5C19.5 18.6046 18.6046 19.5 17.5 19.5H6.5C5.39543 19.5 4.5 18.6046 4.5 17.5V7C4.5 5.89543 5.39543 5 6.5 5Z"
-                                                    stroke="currentColor"
-                                                    strokeWidth="1.8"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                />
-                                            </svg>
-                                        </span>
-                                    </button>
+                                                {startDate ? formatDate(startDate) : "วัน / เดือน / ปี"}
+                                            </span>
+                                            <span className="pawn-calendar-icon" aria-hidden>
+                                                <svg
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M7 3.75V6.25M17 3.75V6.25M4.75 9.25H19.25M6.5 5H17.5C18.6046 5 19.5 5.89543 19.5 7V17.5C19.5 18.6046 18.6046 19.5 17.5 19.5H6.5C5.39543 19.5 4.5 18.6046 4.5 17.5V7C4.5 5.89543 5.39543 5 6.5 5Z"
+                                                        stroke="currentColor"
+                                                        strokeWidth="1.8"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                    />
+                                                </svg>
+                                            </span>
+                                        </button>
 
-                                    {isDatePickerOpen ? (
-                                        <div className="pawn-date-popover" role="dialog" aria-label="เลือกวันเริ่ม">
-                                            <div className="pawn-date-step-header">
-                                                {datePickerStep !== "year" ? (
-                                                    <button
-                                                        className="pawn-date-back-button"
-                                                        type="button"
-                                                        aria-label="ย้อนกลับ"
-                                                        onClick={() =>
-                                                            setDatePickerStep(
-                                                                datePickerStep === "day" ? "month" : "year"
-                                                            )
-                                                        }
-                                                    >
-                                                        ‹
-                                                    </button>
-                                                ) : (
+                                        {isDatePickerOpen ? (
+                                            <div className="pawn-date-popover" role="dialog" aria-label="เลือกวันเริ่ม">
+                                                <div className="pawn-date-step-header">
+                                                    {datePickerStep !== "year" ? (
+                                                        <button
+                                                            className="pawn-date-back-button"
+                                                            type="button"
+                                                            aria-label="ย้อนกลับ"
+                                                            onClick={() =>
+                                                                setDatePickerStep(
+                                                                    datePickerStep === "day" ? "month" : "year"
+                                                                )
+                                                            }
+                                                        >
+                                                            ‹
+                                                        </button>
+                                                    ) : (
+                                                        <span aria-hidden />
+                                                    )}
+                                                    <span className="pawn-date-step-value">
+                                                        {datePickerStep === "year"
+                                                            ? "เลือกปี"
+                                                            : datePickerStep === "month"
+                                                              ? `ปี ${formatBuddhistYear(datePickerDraft.getFullYear())}`
+                                                              : formatMonthYear(datePickerDraft)}
+                                                    </span>
                                                     <span aria-hidden />
-                                                )}
-                                                <span className="pawn-date-step-value">
-                                                    {datePickerStep === "year"
-                                                        ? "เลือกปี"
-                                                        : datePickerStep === "month"
-                                                          ? `ปี ${formatBuddhistYear(datePickerDraft.getFullYear())}`
-                                                          : formatMonthYear(datePickerDraft)}
-                                                </span>
-                                                <span aria-hidden />
-                                            </div>
-
-                                            {datePickerStep === "year" ? (
-                                                <div className="pawn-date-panel">
-                                                    <div className="pawn-date-year-options">
-                                                        {datePickerYears.map((year) => (
-                                                            <button
-                                                                key={year}
-                                                                type="button"
-                                                                className={
-                                                                    datePickerDraft.getFullYear() === year
-                                                                        ? "is-selected"
-                                                                        : ""
-                                                                }
-                                                                disabled={year > currentDate.getFullYear()}
-                                                                onClick={() => {
-                                                                    setDatePickerDraft((previousDate) =>
-                                                                        clampDateToToday(
-                                                                            createSafeDate(
-                                                                                year,
-                                                                                previousDate.getMonth(),
-                                                                                previousDate.getDate()
-                                                                            ),
-                                                                            currentDate
-                                                                        )
-                                                                    )
-                                                                    setDatePickerStep("month")
-                                                                }}
-                                                            >
-                                                                {formatBuddhistYear(year)}
-                                                            </button>
-                                                        ))}
-                                                    </div>
                                                 </div>
-                                            ) : null}
 
-                                            {datePickerStep === "month" ? (
-                                                <div className="pawn-date-panel">
-                                                    <div className="pawn-date-month-options">
-                                                        {THAI_MONTH_LABELS.map((monthLabel, monthIndex) => {
-                                                            const monthStart = new Date(
-                                                                datePickerDraft.getFullYear(),
-                                                                monthIndex,
-                                                                1
-                                                            )
-
-                                                            return (
+                                                {datePickerStep === "year" ? (
+                                                    <div className="pawn-date-panel">
+                                                        <div className="pawn-date-year-options">
+                                                            {datePickerYears.map((year) => (
                                                                 <button
-                                                                    key={monthLabel}
+                                                                    key={year}
                                                                     type="button"
-                                                                    className={
-                                                                        datePickerDraft.getMonth() === monthIndex
-                                                                            ? "is-selected"
-                                                                            : ""
-                                                                    }
-                                                                    disabled={compareDates(monthStart, currentDate) > 0}
+                                                                    disabled={year > currentDate.getFullYear()}
                                                                     onClick={() => {
                                                                         setDatePickerDraft((previousDate) =>
                                                                             clampDateToToday(
                                                                                 createSafeDate(
-                                                                                    previousDate.getFullYear(),
-                                                                                    monthIndex,
+                                                                                    year,
+                                                                                    previousDate.getMonth(),
                                                                                     previousDate.getDate()
                                                                                 ),
                                                                                 currentDate
                                                                             )
                                                                         )
-                                                                        setDatePickerStep("day")
+                                                                        setDatePickerStep("month")
                                                                     }}
                                                                 >
-                                                                    {monthLabel}
+                                                                    {formatBuddhistYear(year)}
                                                                 </button>
-                                                            )
-                                                        })}
+                                                            ))}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ) : null}
+                                                ) : null}
 
-                                            {datePickerStep === "day" ? (
-                                                <div className="pawn-date-panel">
-                                                    <div className="pawn-date-day-options">
-                                                        {Array.from({ length: datePickerDayCount }, (_, index) => {
-                                                            const day = index + 1
-                                                            const optionDate = createSafeDate(
-                                                                datePickerDraft.getFullYear(),
-                                                                datePickerDraft.getMonth(),
-                                                                day
-                                                            )
+                                                {datePickerStep === "month" ? (
+                                                    <div className="pawn-date-panel">
+                                                        <div className="pawn-date-month-options">
+                                                            {THAI_MONTH_LABELS.map((monthLabel, monthIndex) => {
+                                                                const monthStart = new Date(
+                                                                    datePickerDraft.getFullYear(),
+                                                                    monthIndex,
+                                                                    1
+                                                                )
 
-                                                            return (
-                                                                <button
-                                                                    key={day}
-                                                                    type="button"
-                                                                    className={
-                                                                        datePickerDraft.getDate() === day
-                                                                            ? "is-selected"
-                                                                            : ""
-                                                                    }
-                                                                    disabled={compareDates(optionDate, currentDate) > 0}
-                                                                    onClick={() => {
-                                                                        updateStartDate(optionDate)
-                                                                        setDatePickerDraft(
-                                                                            clampDateToToday(optionDate, currentDate)
-                                                                        )
-                                                                        setIsDatePickerOpen(false)
-                                                                        loanInputRef.current?.focus()
-                                                                    }}
-                                                                >
-                                                                    {day}
-                                                                </button>
-                                                            )
-                                                        })}
+                                                                return (
+                                                                    <button
+                                                                        key={monthLabel}
+                                                                        type="button"
+                                                                        disabled={compareDates(monthStart, currentDate) > 0}
+                                                                        onClick={() => {
+                                                                            setDatePickerDraft((previousDate) =>
+                                                                                clampDateToToday(
+                                                                                    createSafeDate(
+                                                                                        previousDate.getFullYear(),
+                                                                                        monthIndex,
+                                                                                        previousDate.getDate()
+                                                                                    ),
+                                                                                    currentDate
+                                                                                )
+                                                                            )
+                                                                            setDatePickerStep("day")
+                                                                        }}
+                                                                    >
+                                                                        {monthLabel}
+                                                                    </button>
+                                                                )
+                                                            })}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                    ) : null}
-                                </div>
-                            )}
-                        </div>
+                                                ) : null}
 
-                        <div className="pawn-field-row">
-                            <label htmlFor={isPrefilled ? undefined : "loanAmount"}>
-                                <span>ยอดจำนำ</span>
-                            </label>
-                            {isPrefilled ? (
-                                <div className="pawn-control pawn-control-readonly">
-                                    {loanInput ? `${loanInput} บาท` : "-"}
-                                </div>
-                            ) : (
-                                <div className="pawn-money-input">
-                                    <input
-                                        ref={loanInputRef}
-                                        id="loanAmount"
-                                        className="pawn-control"
-                                        name="loanAmount"
-                                        type="tel"
-                                        inputMode="numeric"
-                                        pattern="[0-9]*"
-                                        autoComplete="off"
-                                        placeholder="กรอกยอดจำนำ"
-                                        value={loanInput}
-                                        onChange={handleLoanChange}
-                                    />
-                                    <span>บาท</span>
-                                </div>
-                            )}
-                        </div>
+                                                {datePickerStep === "day" ? (
+                                                    <div className="pawn-date-panel">
+                                                        <div className="pawn-date-day-options">
+                                                            {Array.from({ length: datePickerDayCount }, (_, index) => {
+                                                                const day = index + 1
+                                                                const optionDate = createSafeDate(
+                                                                    datePickerDraft.getFullYear(),
+                                                                    datePickerDraft.getMonth(),
+                                                                    day
+                                                                )
 
-                        <div className="pawn-field-row">
-                            <label>
-                                <span>โปรโมชัน</span>
-                            </label>
-                            {isPrefilled ? (
-                                <div className="pawn-control pawn-control-readonly">
-                                    {activePromoLabel}
-                                </div>
-                            ) : (
-                                <div className="pawn-segmented" role="radiogroup" aria-label="โปรโมชัน">
-                                    {PROMO_OPTIONS.map((option) => {
-                                        const isSelected = promoType === option.value
+                                                                return (
+                                                                    <button
+                                                                        key={day}
+                                                                        type="button"
+                                                                        disabled={compareDates(optionDate, currentDate) > 0}
+                                                                        onClick={() => {
+                                                                            updateStartDate(optionDate)
+                                                                            setDatePickerDraft(
+                                                                                clampDateToToday(optionDate, currentDate)
+                                                                            )
+                                                                            setIsDatePickerOpen(false)
+                                                                            loanInputRef.current?.focus()
+                                                                        }}
+                                                                    >
+                                                                        {day}
+                                                                    </button>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                ) : null}
+                                            </div>
+                                        ) : null}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="pawn-field-row">
+                                <label htmlFor={isPrefilled ? undefined : "loanAmount"}>
+                                    <span>ยอดจำนำ</span>
+                                </label>
+                                {isPrefilled ? (
+                                    <div className="pawn-control pawn-control-readonly">
+                                        {loanInput ? `${loanInput} บาท` : "-"}
+                                    </div>
+                                ) : (
+                                    <div className="pawn-money-input">
+                                        <input
+                                            ref={loanInputRef}
+                                            id="loanAmount"
+                                            className="pawn-control"
+                                            name="loanAmount"
+                                            type="text"
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            enterKeyHint="done"
+                                            autoComplete="off"
+                                            placeholder="กรอกยอดจำนำ"
+                                            value={loanInput}
+                                            onChange={handleLoanChange}
+                                        />
+                                        <span>บาท</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="pawn-field-row">
+                                <label>
+                                    <span>โปรโมชัน</span>
+                                </label>
+                                {isPrefilled ? (
+                                    <div className="pawn-control pawn-control-readonly">
+                                        {activePromoLabel}
+                                    </div>
+                                ) : (
+                                    <div className="pawn-segmented" role="radiogroup" aria-label="โปรโมชัน">
+                                        {PROMO_OPTIONS.map((option) => {
+                                            const isSelected = promoType === option.value
+                                            return (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    role="radio"
+                                                    aria-checked={isSelected}
+                                                    className={isSelected ? "is-selected" : ""}
+                                                    onClick={() => setPromoType(option.value)}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="pawn-field-row pawn-field-row-last">
+                                <label>
+                                    <span>รายการ</span>
+                                </label>
+                                <div className="pawn-segmented" role="radiogroup" aria-label="รายการ">
+                                    {TRANSACTION_OPTIONS.map((option) => {
+                                        const isSelected = transactionType === option.value
                                         return (
                                             <button
                                                 key={option.value}
@@ -947,130 +976,106 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                                                 role="radio"
                                                 aria-checked={isSelected}
                                                 className={isSelected ? "is-selected" : ""}
-                                                onClick={() => setPromoType(option.value)}
+                                                onClick={() => setTransactionType(option.value)}
                                             >
                                                 {option.label}
                                             </button>
                                         )
                                     })}
                                 </div>
-                            )}
+                            </div>
                         </div>
 
-                        <div className="pawn-field-row pawn-field-row-last">
-                            <label>
-                                <span>รายการ</span>
-                            </label>
-                            <div className="pawn-segmented" role="radiogroup" aria-label="รายการ">
-                                {TRANSACTION_OPTIONS.map((option) => {
-                                    const isSelected = transactionType === option.value
-                                    return (
-                                        <button
-                                            key={option.value}
-                                            type="button"
-                                            role="radio"
-                                            aria-checked={isSelected}
-                                            className={isSelected ? "is-selected" : ""}
-                                            onClick={() => setTransactionType(option.value)}
-                                        >
-                                            {option.label}
-                                        </button>
-                                    )
-                                })}
+                        <div className="pawn-result-wrap">
+                            <div
+                                className={`pawn-card pawn-result-card ${
+                                    result?.mode === "blocked" ? "is-warning" : ""
+                                }`}
+                            >
+                                {validationMessages.length > 0 ? (
+                                    <div className="pawn-empty-state">
+                                        <strong>
+                                            เมื่อกรอกข้อมูลครบ
+                                            <br />
+                                            ระบบจะคำนวณอัตโนมัติ
+                                        </strong>
+                                    </div>
+                                ) : engineError ? (
+                                    <div className="pawn-warning-content">
+                                        <span className="pawn-warning-kicker">Engine error</span>
+                                        <strong>ไม่สามารถคำนวณได้</strong>
+                                        <p>{engineError}</p>
+                                    </div>
+                                ) : result?.mode === "blocked" ? (
+                                    <div className="pawn-warning-content">
+                                        <span className="pawn-warning-kicker">{result.status}</span>
+                                        <strong>{result.blockedTitle}</strong>
+                                        <p>{result.blockedMessage}</p>
+                                    </div>
+                                ) : result ? (
+                                    <div className="pawn-result-content">
+                                        <div className="pawn-result-main">
+                                            {transactionType === "ต่อดอก" ? (
+                                                <div className="pawn-result-note">
+                                                    {`ต่อดอก ${result.monthCount} เดือน ถึงวันที่ ${formatThaiDate(result.nextBoundary)}`}
+                                                </div>
+                                            ) : null}
+                                            <span>
+                                                {transactionType === "ต่อดอก"
+                                                    ? "ดอกเบี้ยที่ต้องชำระในการต่อดอก"
+                                                    : "เงินต้นและดอกเบี้ยที่ต้องชำระในการไถ่"}
+                                            </span>
+                                            <strong>
+                                                {formatBaht(totalRedeemAmount ?? result.interestAmount ?? 0)}
+                                                <em>บาท</em>
+                                            </strong>
+                                        </div>
+
+                                        <div className="pawn-result-grid">
+                                            <ResultRow
+                                                label="วันที่คำนวณ"
+                                                value={formatThaiDate(formatDateInputValue(currentDate))}
+                                            />
+                                            {transactionType === "ไถ่ของ" ? (
+                                                <>
+                                                    <ResultRow
+                                                        label="เงินต้น"
+                                                        value={`${formatBaht(loanAmount)} บาท`}
+                                                    />
+                                                    <ResultRow
+                                                        label="ดอกเบี้ย"
+                                                        value={`${formatBaht(result.interestAmount ?? 0)} บาท`}
+                                                    />
+                                                </>
+                                            ) : null}
+                                            <ResultRow
+                                                label="ระยะเวลาทั้งสิ้น"
+                                                value={`${result.actualMonthCount} เดือน ${result.overdueFromLatestBoundary} วัน`}
+                                                separated={transactionType === "ไถ่ของ"}
+                                            />
+                                            <ResultRow
+                                                label="วิธีคิดดอก"
+                                                value={formatWeeklyAdditionLineBreak(result.method)}
+                                                highlight
+                                            />
+                                            <ResultRow
+                                                label="คำนวณ"
+                                                value={formatWeeklyAdditionLineBreak(result.formulaText)}
+                                                highlight
+                                            />
+                                            <ResultRow
+                                                label="สถานะสัญญา"
+                                                value={result.status}
+                                                separated
+                                            />
+                                            <ResultRow label="สถานะไถ่ของ" value="สามารถไถ่ได้" />
+                                        </div>
+                                    </div>
+                                ) : null}
                             </div>
                         </div>
                     </div>
-
-                    <div className="pawn-result-wrap">
-                        <div
-                            className={`pawn-card pawn-result-card ${
-                                result?.mode === "blocked" ? "is-warning" : ""
-                            }`}
-                        >
-                            {validationMessages.length > 0 ? (
-                                <div className="pawn-empty-state">
-                                    <strong>กรอกข้อมูลให้ครบเพื่อคำนวณ</strong>
-                                    <div className="pawn-validation-list">
-                                        {validationMessages.map((message) => (
-                                            <span key={message}>{message}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            ) : engineError ? (
-                                <div className="pawn-warning-content">
-                                    <span className="pawn-warning-kicker">Engine error</span>
-                                    <strong>ไม่สามารถคำนวณได้</strong>
-                                    <p>{engineError}</p>
-                                </div>
-                            ) : result?.mode === "blocked" ? (
-                                <div className="pawn-warning-content">
-                                    <span className="pawn-warning-kicker">{result.status}</span>
-                                    <strong>{result.blockedTitle}</strong>
-                                    <p>{result.blockedMessage}</p>
-                                </div>
-                            ) : result ? (
-                                <div className="pawn-result-content">
-                                    <div className="pawn-result-main">
-                                        {transactionType === "ต่อดอก" ? (
-                                            <div className="pawn-result-note">
-                                                {`ต่อดอก ${result.monthCount} เดือน ถึงวันที่ ${formatThaiDate(result.nextBoundary)}`}
-                                            </div>
-                                        ) : null}
-                                        <span>
-                                            {transactionType === "ต่อดอก"
-                                                ? "ดอกเบี้ยที่ต้องชำระในการต่อดอก"
-                                                : "เงินต้นและดอกเบี้ยที่ต้องชำระในการไถ่"}
-                                        </span>
-                                        <strong>
-                                            {formatBaht(totalRedeemAmount ?? result.interestAmount ?? 0)}
-                                            <em>บาท</em>
-                                        </strong>
-                                    </div>
-
-                                    <div className="pawn-result-grid">
-                                        <ResultRow
-                                            label="วันที่คำนวณ"
-                                            value={formatThaiDate(formatDateInputValue(currentDate))}
-                                        />
-                                        {transactionType === "ไถ่ของ" ? (
-                                            <>
-                                                <ResultRow
-                                                    label="เงินต้น"
-                                                    value={`${formatBaht(loanAmount)} บาท`}
-                                                />
-                                                <ResultRow
-                                                    label="ดอกเบี้ย"
-                                                    value={`${formatBaht(result.interestAmount ?? 0)} บาท`}
-                                                />
-                                            </>
-                                        ) : null}
-                                        <ResultRow
-                                            label="ระยะเวลาทั้งสิ้น"
-                                            value={`${result.actualMonthCount} เดือน ${result.overdueFromLatestBoundary} วัน`}
-                                            separated={transactionType === "ไถ่ของ"}
-                                        />
-                                        <ResultRow
-                                            label="วิธีคิดดอก"
-                                            value={formatWeeklyAdditionLineBreak(result.method)}
-                                            highlight
-                                        />
-                                        <ResultRow
-                                            label="คำนวณ"
-                                            value={formatWeeklyAdditionLineBreak(result.formulaText)}
-                                            highlight
-                                        />
-                                        <ResultRow
-                                            label="สถานะสัญญา"
-                                            value={result.status}
-                                            separated
-                                        />
-                                        <ResultRow label="สถานะไถ่ของ" value="สามารถไถ่ได้" />
-                                    </div>
-                                </div>
-                            ) : null}
-                        </div>
-                    </div>
-                </div>
+                ) : null}
 
                 {resolvedStaffLookupViewModel ? (
                     <section className="staff-dual-summary-section">
@@ -1114,7 +1119,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                     </section>
                 ) : null}
 
-                {result && optionEntries.length > 0 ? (
+                {!props.hideCalculatorBody && result && optionEntries.length > 0 ? (
                     <section className="pawn-extend-options-section">
                         <div className="pawn-card pawn-extend-options-card">
                             {optionEntries.map((entry) => (

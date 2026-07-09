@@ -1,5 +1,5 @@
 import * as React from "react"
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { ManualCalculator } from "@/components/manual-calculator"
 
@@ -33,9 +33,51 @@ describe("ManualCalculator", () => {
     it("shows validation for invalid input", async () => {
         render(<ManualCalculator />)
 
-        expect(screen.getByText("กรอกข้อมูลให้ครบเพื่อคำนวณ")).toBeInTheDocument()
-        expect(screen.getByText("กรุณาเลือกวันเริ่ม")).toBeInTheDocument()
-        expect(screen.getByText("กรุณากรอกยอดจำนำ")).toBeInTheDocument()
+        expect(
+            screen.getByText(/เมื่อกรอกข้อมูลครบ/i)
+        ).toBeInTheDocument()
+        expect(
+            screen.getByText(/ระบบจะคำนวณอัตโนมัติ/i)
+        ).toBeInTheDocument()
+        expect(screen.queryByText("กรุณาเลือกวันเริ่ม")).not.toBeInTheDocument()
+        expect(screen.queryByText("กรุณากรอกยอดจำนำ")).not.toBeInTheDocument()
+    })
+
+    it("does not preselect a date when opening the picker from empty state", async () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+
+        const dialog = screen.getByRole("dialog", { name: "เลือกวันเริ่ม" })
+
+        expect(within(dialog).queryByRole("button", { name: "2567" })).not.toHaveClass(
+            "is-selected"
+        )
+        expect(within(dialog).queryByRole("button", { name: "2566" })).not.toHaveClass(
+            "is-selected"
+        )
+        expect(within(dialog).queryByRole("button", { name: "2565" })).not.toHaveClass(
+            "is-selected"
+        )
+    })
+
+    it("does not show selected styling while navigating the date picker", async () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+        fireEvent.click(screen.getByRole("button", { name: "2567" }))
+
+        const monthDialog = screen.getByRole("dialog", { name: "เลือกวันเริ่ม" })
+        expect(within(monthDialog).queryByRole("button", { name: "มิ.ย." })).not.toHaveClass(
+            "is-selected"
+        )
+
+        fireEvent.click(screen.getByRole("button", { name: "มิ.ย." }))
+
+        const dayDialog = screen.getByRole("dialog", { name: "เลือกวันเริ่ม" })
+        expect(within(dayDialog).queryByRole("button", { name: "10" })).not.toHaveClass(
+            "is-selected"
+        )
     })
 
     it("renders locked prefilled fields for staff lookup mode", async () => {
