@@ -28,7 +28,9 @@ interface PrefilledRecord {
 
 interface ManualCalculatorProps {
     title?: React.ReactNode
+    titleLeadingAction?: React.ReactNode
     titleAction?: React.ReactNode
+    titleRowClassName?: string
     headerAction?: React.ReactNode
     topAction?: React.ReactNode
     notice?: React.ReactNode
@@ -650,14 +652,6 @@ export function ManualCalculator(props: ManualCalculatorProps) {
         isPrefilled && staffLookupViewModel && props.showStaffLookupMetadata
     )
     const resolvedStaffLookupViewModel = showStaffLookupMeta ? staffLookupViewModel : null
-    const redeemSummaryAmount =
-        resolvedStaffLookupViewModel?.redeem.result.interestAmount !== null &&
-        resolvedStaffLookupViewModel?.redeem.result.interestAmount !== undefined
-            ? formatBaht(
-                  resolvedStaffLookupViewModel.record.loanAmount +
-                      resolvedStaffLookupViewModel.redeem.result.interestAmount
-              )
-            : null
 
     return (
         <main className="phase-page">
@@ -665,7 +659,14 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 {props.topAction ? <div className="pawn-top-action">{props.topAction}</div> : null}
 
                 <header className="pawn-header pawn-header-with-actions">
-                    <div className="pawn-title-row">
+                    <div
+                        className={
+                            props.titleRowClassName
+                                ? `pawn-title-row ${props.titleRowClassName}`
+                                : "pawn-title-row"
+                        }
+                    >
+                        {props.titleLeadingAction}
                         <h1>{props.title ?? "คำนวณดอกเบี้ยจำนำ"}</h1>
                         {props.titleAction}
                     </div>
@@ -685,35 +686,22 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                         ) : null}
 
                         <div className="pawn-card staff-lookup-meta-card">
-                            <div className="staff-lookup-meta-grid">
-                                <div>
-                                    <span>Pawn ID</span>
-                                    <strong>{resolvedStaffLookupViewModel.record.pawnId}</strong>
-                                </div>
-                                <div>
-                                    <span>สถานะข้อมูล</span>
-                                    <strong>
-                                        {resolvedStaffLookupViewModel.record.archivedFromSource
-                                            ? "archived_from_source"
-                                            : "active"}
-                                    </strong>
-                                </div>
-                                <div>
-                                    <span>sync ล่าสุด</span>
-                                    <strong>
-                                        {formatThaiDateTime(
-                                            resolvedStaffLookupViewModel.record.lastSyncedAt
-                                        )}
-                                    </strong>
-                                </div>
-                                <div>
-                                    <span>source ล่าสุด</span>
-                                    <strong>
-                                        {formatThaiDateTime(
-                                            resolvedStaffLookupViewModel.record.sourceUpdatedAt
-                                        )}
-                                    </strong>
-                                </div>
+                            <div className="staff-lookup-meta-line">
+                                {resolvedStaffLookupViewModel.record.archivedFromSource ? (
+                                    <>
+                                        <span>สถานะข้อมูล</span>
+                                        <strong>archived_from_source</strong>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>อัพเดทล่าสุด</span>
+                                        <strong>
+                                            {formatThaiDateTime(
+                                                resolvedStaffLookupViewModel.record.lastSyncedAt
+                                            )}
+                                        </strong>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </>
@@ -1111,48 +1099,6 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                     </div>
                 ) : null}
 
-                {resolvedStaffLookupViewModel ? (
-                    <section className="staff-dual-summary-section">
-                        <div className="staff-dual-summary-heading">
-                            สรุปทั้งสองรายการจากข้อมูลใบจำนำ
-                        </div>
-                        <div className="staff-dual-summary-grid">
-                            <div className="pawn-card staff-dual-summary-card">
-                                <span>ต่อดอก</span>
-                                <strong>
-                                    {formatBaht(
-                                        resolvedStaffLookupViewModel.extend.result.interestAmount ??
-                                            0
-                                    )}{" "}
-                                    บาท
-                                </strong>
-                                <p>{resolvedStaffLookupViewModel.extend.result.formulaText}</p>
-                                <p>{resolvedStaffLookupViewModel.extend.result.status}</p>
-                            </div>
-
-                            <div
-                                className={`pawn-card staff-dual-summary-card ${
-                                    resolvedStaffLookupViewModel.redeem.result.mode === "blocked"
-                                        ? "is-warning"
-                                        : ""
-                                }`}
-                            >
-                                <span>ไถ่ของ</span>
-                                <strong>
-                                    {redeemSummaryAmount
-                                        ? `${redeemSummaryAmount} บาท`
-                                        : "ไม่สามารถไถ่ได้"}
-                                </strong>
-                                <p>{resolvedStaffLookupViewModel.redeem.result.formulaText}</p>
-                                <p>{resolvedStaffLookupViewModel.redeem.result.status}</p>
-                            </div>
-                        </div>
-                        {props.lookupAction ? (
-                            <div className="staff-dual-summary-action">{props.lookupAction}</div>
-                        ) : null}
-                    </section>
-                ) : null}
-
                 {!props.hideCalculatorBody && result && optionEntries.length > 0 ? (
                     <section className="pawn-extend-options-section">
                         <div className="pawn-card pawn-extend-options-card">
@@ -1178,6 +1124,10 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                             ))}
                         </div>
                     </section>
+                ) : null}
+
+                {props.lookupAction ? (
+                    <div className="staff-dual-summary-action">{props.lookupAction}</div>
                 ) : null}
 
                 {props.bottomAction ? (

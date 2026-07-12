@@ -1135,73 +1135,38 @@ select {
 }
 
 .staff-lookup-meta-card {
-    margin-bottom: 12px;
-    padding: 20px 20px 18px;
+    margin-bottom: 24px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
-.staff-lookup-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px 18px;
+.staff-lookup-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
 }
 
-.staff-lookup-meta-grid span,
-.staff-dual-summary-card span,
-.staff-dual-summary-heading {
-    display: block;
+.staff-lookup-meta-line span {
     color: var(--pawn-muted);
     font-size: calc(var(--pawn-font-size) * 0.78);
     line-height: 1.35;
 }
 
-.staff-lookup-meta-grid strong,
-.staff-dual-summary-card strong {
-    display: block;
-    margin-top: 4px;
-    color: var(--pawn-text);
-    font-size: calc(var(--pawn-font-size) * 0.92);
-    font-weight: 650;
+.staff-lookup-meta-line strong {
+    color: var(--pawn-muted);
+    font-size: 14.04px;
+    font-weight: 400;
     line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
-.staff-dual-summary-section {
-    margin-top: 12px;
-}
-
-.staff-dual-summary-heading {
-    margin-bottom: 10px;
-}
-
 .staff-dual-summary-action {
     margin-top: 12px;
-}
-
-.staff-dual-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-}
-
-.staff-dual-summary-card {
-    padding: 18px 20px;
-}
-
-.staff-dual-summary-card strong {
-    color: var(--pawn-accent);
-    font-size: calc(var(--pawn-font-size) * 1.3);
-    line-height: 1.15;
-}
-
-.staff-dual-summary-card p {
-    margin: 8px 0 0;
-    color: var(--pawn-text);
-    font-size: calc(var(--pawn-font-size) * 0.82);
-    line-height: 1.45;
-}
-
-.staff-dual-summary-card.is-warning {
-    border-color: rgba(255, 189, 128, 0.72);
 }
 
 .staff-mode-switch a,
@@ -1297,6 +1262,11 @@ select {
     border-color: rgba(255, 170, 170, 0.32);
 }
 
+.staff-sync-health-note {
+    color: var(--pawn-muted);
+    font-size: 13px;
+}
+
 .staff-results-stack {
     display: grid;
     gap: 12px;
@@ -1350,9 +1320,10 @@ select {
     gap: 12px;
 }
 
-.staff-sync-health-group:first-child {
-    padding-bottom: 0;
-    border-bottom: 1px solid var(--pawn-outline);
+.staff-sync-health-separator {
+    height: 1px;
+    margin: 12px 20px;
+    background: rgba(255, 247, 230, 0.78);
 }
 
 .staff-sync-health-title-row {
@@ -1484,7 +1455,7 @@ select {
 }
 
 .staff-sync-health-card strong {
-    color: var(--pawn-accent);
+    color: var(--pawn-text);
     font-size: 14.04px;
 }
 
@@ -1495,8 +1466,24 @@ select {
 .staff-sync-health-table-card h2 {
     margin: 0 0 12px;
     color: var(--pawn-muted);
-    font-size: calc(var(--pawn-font-size) * 0.82);
-    font-weight: 600;
+    font-size: 14.04px;
+    font-weight: 400;
+}
+
+.staff-sync-health-issues-card {
+    border-color: rgba(245, 199, 75, 0.52);
+}
+
+.staff-sync-health-issues-card h2 {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.staff-sync-health-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 14px;
 }
 
 .staff-sync-health-summary,
@@ -1509,10 +1496,31 @@ select {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.staff-sync-issue-header,
 .staff-sync-issue-row {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 12px;
+}
+
+.staff-sync-issue-header {
+    padding-bottom: 4px;
+}
+
+.staff-sync-issue-header span {
+    color: var(--pawn-muted);
+    font-size: 14.04px;
+    font-weight: 400;
+    line-height: 1.35;
+}
+
+.staff-sync-health-table-card .staff-auth-message,
+.staff-sync-issue-row strong {
+    font-size: 14.04px;
+    font-weight: 400;
+}
+
+.staff-sync-issue-row {
     padding-top: 12px;
     border-top: 1px solid rgba(245, 199, 75, 0.12);
 }
@@ -1520,6 +1528,10 @@ select {
 .staff-sync-issue-row:first-child {
     padding-top: 0;
     border-top: 0;
+}
+
+.staff-sync-issue-row.is-stale {
+    opacity: 0.48;
 }
 
 .staff-payment-section,
@@ -1740,10 +1752,10 @@ select {
     .staff-header,
     .staff-calculation-grid,
     .staff-record-grid,
-    .staff-lookup-meta-grid,
-    .staff-dual-summary-grid,
     .staff-sync-health-group,
+    .staff-sync-health-summary-cards,
     .staff-sync-health-summary,
+    .staff-sync-issue-header,
     .staff-sync-issue-row,
     .staff-payment-row,
     .staff-payment-detail-grid {

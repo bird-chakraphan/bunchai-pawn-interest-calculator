@@ -44,7 +44,34 @@ export default async function StaffHomePage(props: {
     return (
         <ManualCalculator
             title="คำนวณดอกเบี้ยจำนำ"
+            titleLeadingAction={
+                record ? (
+                    <Link
+                        aria-label="ล้างการค้นหา"
+                        className="staff-sync-health-back-link"
+                        href="/staff"
+                        title="ล้างการค้นหา"
+                    >
+                        <svg
+                            aria-hidden="true"
+                            fill="none"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            width="24"
+                        >
+                            <path
+                                d="M15 5 8 12l7 7"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.25"
+                            />
+                        </svg>
+                    </Link>
+                ) : null
+            }
             titleAction={<StaffTitleMenu signOutAction={signOutAction} />}
+            titleRowClassName={record ? "staff-sync-health-title-row" : undefined}
             headerAction={
                 record ? null : (
                     <div className="staff-header-actions">
