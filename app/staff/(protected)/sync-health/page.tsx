@@ -1,8 +1,9 @@
 import Link from "next/link"
 import { signOutAction } from "@/app/staff/sign-in/actions"
+import { StaffTitleMenu } from "@/components/staff-title-menu"
 import { formatThaiDateTime } from "@/lib/payment-presentation"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
-import { getSyncHealthSnapshot } from "@/lib/sync-health"
+import { getSyncHealthSnapshot, type SyncHealthSnapshot } from "@/lib/sync-health"
 
 export const dynamic = "force-dynamic"
 
@@ -29,50 +30,86 @@ export default async function StaffSyncHealthPage() {
         )
     }
 
-    const snapshot = await getSyncHealthSnapshot({ supabase })
+    let loadError: string | null = null
+    let snapshot: SyncHealthSnapshot = {
+        latestRun: null,
+        lastSuccessfulRun: null,
+        recentIssues: [],
+        activeRecordCount: 0,
+        archivedRecordCount: 0,
+    }
+
+    try {
+        snapshot = await getSyncHealthSnapshot({ supabase })
+    } catch (error) {
+        loadError =
+            error instanceof Error ? error.message : "ไม่สามารถโหลดข้อมูลสถานะ sync ได้"
+    }
 
     return (
         <main className="phase-page">
             <section className="pawn-calculator-app">
-                <div className="pawn-top-action">
-                    <form action={signOutAction}>
-                        <button className="staff-secondary-button" type="submit">
-                            Sign Out
-                        </button>
-                    </form>
-                </div>
-
                 <header className="pawn-header pawn-header-with-actions">
-                    <div className="pawn-title-row">
-                        <h1>สถานะการ sync ข้อมูล</h1>
-                        <Link className="staff-inline-action" href="/staff">
-                            กลับไปหน้าพนักงาน
+                    <div className="pawn-title-row staff-sync-health-title-row">
+                        <Link
+                            aria-label="กลับไปหน้าพนักงาน"
+                            className="staff-sync-health-back-link"
+                            href="/staff"
+                            title="กลับไปหน้าพนักงาน"
+                        >
+                            <svg
+                                aria-hidden="true"
+                                fill="none"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                width="24"
+                            >
+                                <path
+                                    d="M15 5 8 12l7 7"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2.25"
+                                />
+                            </svg>
                         </Link>
+                        <h1>สถานะข้อมูล</h1>
+                        <StaffTitleMenu signOutAction={signOutAction} />
                     </div>
                 </header>
 
                 <div className="staff-auth-message">
-                    ระบบ sync ข้อมูลจาก Google Sheets ทุก 5 นาที และยังไม่มีปุ่ม Sync now ใน MVP นี้
+                    ระบบ sync ข้อมูลจาก Google Sheets ช่วง 08:00-17:45 ทุก 15 นาทีใกล้กับนาที :00, :15, :30, :45 และช่วงเวลาอื่นทุก 1 ชั่วโมงใกล้กับนาที :00 โดยยังไม่มีปุ่ม Sync now ใน MVP นี้
                 </div>
 
-                <section className="staff-sync-health-grid">
-                    <div className="pawn-card staff-sync-health-card">
-                        <span>Last successful sync</span>
-                        <strong>
-                            {formatThaiDateTime(snapshot.lastSuccessfulRun?.finishedAt ?? null)}
-                        </strong>
+                {loadError ? (
+                    <div className="staff-auth-message is-error">
+                        ไม่สามารถโหลดข้อมูลสถานะ sync ได้: {loadError}
                     </div>
-                    <div className="pawn-card staff-sync-health-card">
-                        <span>Latest run status</span>
-                        <strong>{snapshot.latestRun?.status ?? "-"}</strong>
+                ) : null}
+
+                <section className="staff-sync-health-groups">
+                    <div className="staff-sync-health-group">
+                        <div className="pawn-card staff-sync-health-card">
+                            <span>Active records</span>
+                            <strong>{snapshot.activeRecordCount}</strong>
+                        </div>
+                        <div className="pawn-card staff-sync-health-card">
+                            <span>Archived records</span>
+                            <strong>{snapshot.archivedRecordCount}</strong>
+                        </div>
                     </div>
-                    <div className="pawn-card staff-sync-health-card">
-                        <span>Active records</span>
-                        <strong>{snapshot.activeRecordCount}</strong>
-                    </div>
-                    <div className="pawn-card staff-sync-health-card">
-                        <span>Archived records</span>
-                        <strong>{snapshot.archivedRecordCount}</strong>
+                    <div className="staff-sync-health-group">
+                        <div className="pawn-card staff-sync-health-card">
+                            <span>Last sync</span>
+                            <strong>
+                                {formatThaiDateTime(snapshot.lastSuccessfulRun?.finishedAt ?? null)}
+                            </strong>
+                        </div>
+                        <div className="pawn-card staff-sync-health-card">
+                            <span>Latest status</span>
+                            <strong>{snapshot.latestRun?.status ?? "-"}</strong>
+                        </div>
                     </div>
                 </section>
 
@@ -80,14 +117,6 @@ export default async function StaffSyncHealthPage() {
                     <section className="pawn-card staff-sync-health-table-card">
                         <h2>Latest run summary</h2>
                         <div className="staff-sync-health-summary">
-                            <div>
-                                <span>Started</span>
-                                <strong>{formatThaiDateTime(snapshot.latestRun.startedAt)}</strong>
-                            </div>
-                            <div>
-                                <span>Finished</span>
-                                <strong>{formatThaiDateTime(snapshot.latestRun.finishedAt)}</strong>
-                            </div>
                             <div>
                                 <span>Rows</span>
                                 <strong>{snapshot.latestRun.rowCount}</strong>

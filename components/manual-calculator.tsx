@@ -36,6 +36,7 @@ interface ManualCalculatorProps {
     staffLookupViewModel?: StaffLookupViewModel | null
     showStaffLookupMetadata?: boolean
     lookupAction?: React.ReactNode
+    bottomAction?: React.ReactNode
     hideCalculatorBody?: boolean
     resetVersion?: number
 }
@@ -721,6 +722,16 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 {!props.hideCalculatorBody ? (
                     <div className="pawn-layout">
                         <div className="pawn-card pawn-form-card">
+                            {isPrefilled ? (
+                                <div className="pawn-field-row">
+                                    <label>
+                                        <span>เลขใบจำนำ</span>
+                                    </label>
+                                    <div className="pawn-control pawn-control-readonly">
+                                        {props.prefilledRecord?.pawnId ?? "-"}
+                                    </div>
+                                </div>
+                            ) : null}
                             <div className="pawn-field-row">
                                 <label htmlFor={isPrefilled ? undefined : "pawn-start-date"}>
                                     {renderResponsiveSlashLabel("วันเริ่ม / ต่อดอกล่าสุด")}
@@ -1150,6 +1161,10 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                             ))}
                         </div>
                     </section>
+                ) : null}
+
+                {props.bottomAction ? (
+                    <div className="pawn-bottom-action">{props.bottomAction}</div>
                 ) : null}
             </section>
         </main>

@@ -26,9 +26,14 @@ export default async function StaffProtectedLayout(props: {
         )
     }
 
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    let user = null
+
+    try {
+        const result = await supabase.auth.getUser()
+        user = result.data.user
+    } catch {
+        redirect("/staff/sign-in")
+    }
 
     if (!user) {
         redirect("/staff/sign-in")
