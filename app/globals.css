@@ -40,7 +40,7 @@ select {
 }
 
 .phase-page {
-    padding: 40px 20px;
+    padding: 40px 20px 36px;
 }
 
 .pawn-calculator-app {
@@ -114,6 +114,7 @@ select {
     flex: 1 1 320px;
     min-width: min(100%, 320px);
     padding: 20px 20px 18px;
+    container-type: inline-size;
 }
 
 .pawn-field-row {
@@ -151,6 +152,19 @@ select {
     line-height: 1.25;
 }
 
+.pawn-field-label-row {
+    display: flex;
+    flex: 0.42 1 180px;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.pawn-field-label-row label {
+    flex: 1 1 auto;
+}
+
 .pawn-field-row label span {
     display: block;
 }
@@ -163,6 +177,49 @@ select {
 .pawn-field-row > :not(label) {
     flex: 1 1 230px;
     min-width: min(100%, 230px);
+}
+
+.pawn-field-row > .pawn-field-label-row {
+    flex: 0.42 1 180px;
+    min-width: 0;
+}
+
+.pawn-field-row > .pawn-field-label-row + * {
+    flex: 1 1 230px;
+    min-width: min(100%, 230px);
+}
+
+.pawn-date-shortcut {
+    appearance: none;
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 0;
+    cursor: pointer;
+    border: 0;
+    background: transparent;
+    color: var(--pawn-text);
+    font-size: calc(var(--pawn-font-size) * 0.8);
+    font-weight: 400;
+    line-height: 1.25;
+    transition: opacity 160ms ease;
+}
+
+.pawn-date-shortcut:hover,
+.pawn-date-shortcut:focus-visible {
+    outline: none;
+    opacity: 0.88;
+}
+
+@container (min-width: 420px) {
+    .pawn-date-shortcut {
+        display: none;
+    }
+}
+
+@container (max-width: 419px) {
+    .pawn-field-row > .pawn-field-label-row {
+        flex: 1 0 100%;
+    }
 }
 
 .pawn-control {
@@ -607,6 +664,10 @@ select {
     line-height: 1.35;
 }
 
+.pawn-empty-state strong {
+    color: var(--pawn-text);
+}
+
 .pawn-validation-list {
     display: flex;
     flex-wrap: wrap;
@@ -960,6 +1021,10 @@ select {
 .pawn-title-row:has(.staff-title-menu) > h1 {
     grid-column: 2;
     text-align: center;
+}
+
+.pawn-header:has(.public-title-actions) {
+    margin-bottom: 12px;
 }
 
 .pawn-title-row:has(.public-title-actions) > h1 {
@@ -1628,6 +1693,12 @@ select {
     margin-top: 18px;
 }
 
+@media (max-width: 760px) {
+    .staff-sync-health-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @keyframes pawnFadeIn {
     from {
         opacity: 0;
@@ -1641,12 +1712,16 @@ select {
 }
 
 @media (max-width: 420px) {
-    .pawn-header h1 {
-        font-size: calc(var(--pawn-font-size) * 1.8);
+    .phase-page {
+        padding: 28px 10px 32px;
     }
 
     .pawn-bottom-action {
         margin-top: 24px;
+    }
+
+    .pawn-header h1 {
+        font-size: calc(var(--pawn-font-size) * 1.8);
     }
 
     .pawn-form-card,

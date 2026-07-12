@@ -44,6 +44,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
         error: null,
     })
     const [calculatorResetVersion, setCalculatorResetVersion] = React.useState(0)
+    const fullPawnId = pawnId ? `I${pawnId}` : ""
 
     async function handleLookupSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
@@ -55,7 +56,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
                 "content-type": "application/json",
             },
             body: JSON.stringify({
-                pawnId,
+                pawnId: fullPawnId,
                 phone,
             }),
         })
@@ -143,7 +144,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
                 "content-type": "application/json",
             },
             body: JSON.stringify({
-                pawnId,
+                pawnId: fullPawnId,
                 phone,
             }),
         })
@@ -208,18 +209,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
             </button>
         </div>
     )
-    const titleAction = successResult ? (
-        <div className="public-title-actions">
-            <div className="pawn-card public-mode-switch-card">{modeSwitch}</div>
-            <button
-                className="staff-inline-action"
-                type="button"
-                onClick={clearLookup}
-            >
-                ล้างการค้นหา
-            </button>
-        </div>
-    ) : (
+    const titleAction = (
         <div className="public-title-actions">
             <div className="pawn-card public-mode-switch-card">{modeSwitch}</div>
         </div>
@@ -228,11 +218,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
     return (
         <ManualCalculator
             resetVersion={calculatorResetVersion}
-            title={
-                successResult
-                    ? `คำนวณดอกเบี้ยจำนำ รหัส ${successResult.record.pawnId}`
-                    : "คำนวณดอกเบี้ยจำนำ"
-            }
+            title="คำนวณดอกเบี้ยจำนำ"
             titleAction={titleAction}
             headerAction={
                 isLookupMode && !successResult ? (
@@ -246,9 +232,14 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
                                     id="public-pawn-id"
                                     className="pawn-control"
                                     name="pawnId"
-                                    placeholder="กรอกเลขใบจำนำ"
+                                    placeholder="กรอกตัวเลข 5 ตัวในใบจำนำ"
+                                    inputMode="numeric"
+                                    maxLength={5}
+                                    pattern="[0-9]*"
                                     value={pawnId}
-                                    onChange={(event) => setPawnId(event.target.value)}
+                                    onChange={(event) =>
+                                        setPawnId(event.target.value.replace(/\D/g, "").slice(0, 5))
+                                    }
                                 />
                             </div>
                             <div className="pawn-field-row pawn-field-row-last">
@@ -260,6 +251,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
                                     className="pawn-control"
                                     name="phone"
                                     placeholder="กรอกเบอร์โทรศัพท์"
+                                    inputMode="numeric"
                                     value={phone}
                                     onChange={(event) => setPhone(event.target.value)}
                                 />
@@ -283,6 +275,17 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
                         onClick={handleExtendPayment}
                     >
                         {paymentState.isLoading ? "กำลังเชื่อมไปหน้าชำระเงิน..." : "ชำระต่อดอกออนไลน์"}
+                    </button>
+                ) : null
+            }
+            bottomAction={
+                successResult ? (
+                    <button
+                        className="staff-inline-action public-clear-lookup"
+                        type="button"
+                        onClick={clearLookup}
+                    >
+                        ล้างการค้นหา
                     </button>
                 ) : null
             }

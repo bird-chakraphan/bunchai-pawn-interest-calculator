@@ -2,6 +2,42 @@ import { describe, expect, it } from "vitest"
 import { calculatePawnInterest } from "@/lib/pawn-interest"
 
 describe("calculatePawnInterest", () => {
+    it("treats same-day extension as zero completed months", () => {
+        const result = calculatePawnInterest({
+            startDate: "2024-07-10",
+            currentDate: "2024-07-10",
+            loanAmount: 12000,
+            promoType: "โปร 2%",
+            transactionType: "ต่อดอก",
+        })
+
+        expect(result.mode).toBe("monthlyPromo")
+        expect(result.monthCount).toBe(0)
+        expect(result.actualMonthCount).toBe(0)
+        expect(result.interestAmount).toBe(0)
+        expect(result.formulaText).toBe("12,000 × 2% × 0 เดือน")
+        expect(result.method).toBe("คิดเดือนจริง โปร 2%")
+        expect(result.status).toBe("ภายในระยะเวลา")
+    })
+
+    it("treats same-day redeem as one started month", () => {
+        const result = calculatePawnInterest({
+            startDate: "2024-07-10",
+            currentDate: "2024-07-10",
+            loanAmount: 12000,
+            promoType: "โปร 2%",
+            transactionType: "ไถ่ของ",
+        })
+
+        expect(result.mode).toBe("monthlyPromo")
+        expect(result.monthCount).toBe(1)
+        expect(result.actualMonthCount).toBe(0)
+        expect(result.interestAmount).toBe(240)
+        expect(result.formulaText).toBe("12,000 × 2% × 1 เดือน")
+        expect(result.method).toBe("ปัดเต็มเดือน โปร 2%")
+        expect(result.status).toBe("ภายในระยะเวลา")
+    })
+
     it("calculates exact one-month extension with promo 2%", () => {
         const result = calculatePawnInterest({
             startDate: "2024-06-10",

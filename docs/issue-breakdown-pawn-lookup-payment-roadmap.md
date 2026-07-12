@@ -21,7 +21,7 @@ ready-for-agent
 - #1: PRD: Bunchai Pawn Interest Lookup And Payment Roadmap
 - #2: Establish app foundation with tested calculation engine
 - #3: Add individual staff login and audit-friendly session state
-- #4: Sync Google Sheet pawn records into Supabase every 5 minutes
+- #4: Sync Google Sheet pawn records into Supabase every 15 minutes
 - #5: Deliver staff Pawn ID lookup with both action calculations
 - #6: Add staff sync health and data quality review
 - #7: Deliver customer lookup with Pawn ID and mobile verification

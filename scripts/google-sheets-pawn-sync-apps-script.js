@@ -10,7 +10,7 @@
  *    - INTERNAL_SYNC_SECRET=<same value as the app env>
  *    - PROMO_COLUMN_LETTER=<optional override; default is AL / Base Percentage>
  *    - DEFAULT_PROMO_TYPE=<optional fallback; use only if Base Percentage is blank>
- * 5. Run installFiveMinuteTrigger once.
+ * 5. Run installDualFrequencyTriggers once.
  *
  * This script intentionally sends the full current source dataset. The app
  * upserts active rows and marks missing rows archived_from_source.
@@ -28,20 +28,43 @@ const CONFIG = {
     CUSTOMER_ID_COLUMN_IN_CUSTOMER: "A",
     CUSTOMER_PHONE_COLUMN: "F",
     FIRST_DATA_ROW: 2,
+    BUSINESS_HOURS_START: 8,
+    BUSINESS_HOURS_END: 18,
 }
 
-function installFiveMinuteTrigger() {
+const QUARTER_HOUR_MINUTES = [0, 15, 30, 45]
+
+function installDualFrequencyTriggers() {
     ScriptApp.getProjectTriggers()
         .filter((trigger) => trigger.getHandlerFunction() === "syncPawnRecords")
         .forEach((trigger) => ScriptApp.deleteTrigger(trigger))
 
-    ScriptApp.newTrigger("syncPawnRecords")
-        .timeBased()
-        .everyMinutes(5)
-        .create()
+    QUARTER_HOUR_MINUTES.forEach((minute) => {
+        ScriptApp.newTrigger("syncPawnRecords")
+            .timeBased()
+            .everyHours(1)
+            .nearMinute(minute)
+            .create()
+    })
 }
 
-function syncPawnRecords() {
+function installQuarterHourTriggers() {
+    installDualFrequencyTriggers()
+}
+
+function installFiveMinuteTrigger() {
+    installDualFrequencyTriggers()
+}
+
+function syncPawnRecords(event) {
+    if (event && !shouldRunScheduledSyncNow_()) {
+        return {
+            ok: true,
+            skipped: true,
+            reason: "Outside business-hour quarter-hour window",
+        }
+    }
+
     const properties = PropertiesService.getScriptProperties()
     const endpoint = requireScriptProperty_(properties, "APP_SYNC_ENDPOINT")
     const syncSecret = requireScriptProperty_(properties, "INTERNAL_SYNC_SECRET")
@@ -92,6 +115,28 @@ function syncPawnRecords() {
     }
 
     return JSON.parse(response.getContentText())
+}
+
+function shouldRunScheduledSyncNow_() {
+    const now = new Date()
+    const localNowText = Utilities.formatDate(
+        now,
+        Session.getScriptTimeZone(),
+        "H:m"
+    )
+    const [hourText, minuteText] = localNowText.split(":")
+    const hour = Number(hourText)
+    const minute = Number(minuteText)
+
+    if (minute === 0) {
+        return true
+    }
+
+    if (minute !== 15 && minute !== 30 && minute !== 45) {
+        return false
+    }
+
+    return hour >= CONFIG.BUSINESS_HOURS_START && hour < CONFIG.BUSINESS_HOURS_END
 }
 
 function buildCustomerPhoneById_(sheet) {

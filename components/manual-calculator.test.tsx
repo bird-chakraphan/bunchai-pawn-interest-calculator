@@ -30,6 +30,42 @@ describe("ManualCalculator", () => {
         expect(screen.getByText("ภายในวันที่ 10 ส.ค. 2567")).toBeInTheDocument()
     })
 
+    it("shows zero months for same-day extension", async () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+        fireEvent.click(screen.getByRole("button", { name: "2567" }))
+        fireEvent.click(screen.getByRole("button", { name: "ก.ค." }))
+        fireEvent.click(screen.getByRole("button", { name: "10" }))
+        fireEvent.change(screen.getByLabelText("ยอดจำนำ"), {
+            target: { value: "12000" },
+        })
+
+        expect(screen.getByText("0", { selector: "strong" })).toBeInTheDocument()
+        expect(screen.getByText("12,000 × 2% × 0 เดือน")).toBeInTheDocument()
+        expect(screen.getByText("คิดเดือนจริง โปร 2%")).toBeInTheDocument()
+        expect(screen.getByText("ต่อดอก 0 เดือน ถึงวันที่ 10 ส.ค. 2567")).toBeInTheDocument()
+        expect(screen.getByText("0 เดือน 0 วัน")).toBeInTheDocument()
+    })
+
+    it("shows one started month for same-day redeem", async () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+        fireEvent.click(screen.getByRole("button", { name: "2567" }))
+        fireEvent.click(screen.getByRole("button", { name: "ก.ค." }))
+        fireEvent.click(screen.getByRole("button", { name: "10" }))
+        fireEvent.change(screen.getByLabelText("ยอดจำนำ"), {
+            target: { value: "12000" },
+        })
+        fireEvent.click(screen.getByRole("radio", { name: "ไถ่ของ" }))
+
+        expect(screen.getByText("12,240", { selector: "strong" })).toBeInTheDocument()
+        expect(screen.getByText("12,000 × 2% × 1 เดือน")).toBeInTheDocument()
+        expect(screen.getByText("ปัดเต็มเดือน โปร 2%")).toBeInTheDocument()
+        expect(screen.getByText("0 เดือน 0 วัน")).toBeInTheDocument()
+    })
+
     it("shows validation for invalid input", async () => {
         render(<ManualCalculator />)
 
@@ -61,6 +97,19 @@ describe("ManualCalculator", () => {
         )
     })
 
+    it("lists date-picker years from oldest to newest", () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+
+        const dialog = screen.getByRole("dialog", { name: "เลือกวันเริ่ม" })
+        expect(
+            within(dialog)
+                .getAllByRole("button")
+                .map((button) => button.textContent)
+        ).toEqual(["2565", "2566", "2567"])
+    })
+
     it("does not show selected styling while navigating the date picker", async () => {
         render(<ManualCalculator />)
 
@@ -78,6 +127,14 @@ describe("ManualCalculator", () => {
         expect(within(dayDialog).queryByRole("button", { name: "10" })).not.toHaveClass(
             "is-selected"
         )
+    })
+
+    it("lets the user quickly fill today's date from the shortcut button", async () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByRole("button", { name: "เลือกวันนี้" }))
+
+        expect(screen.getByText("10 ก.ค. 2567")).toBeInTheDocument()
     })
 
     it("renders locked prefilled fields for staff lookup mode", async () => {

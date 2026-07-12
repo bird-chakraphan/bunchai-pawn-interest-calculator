@@ -113,11 +113,16 @@ function calculateMonthlyBoundaries(startDate: Date, currentDate: Date) {
 }
 
 function calculateStartedMonthCount(
+    transactionType: TransactionType,
     currentDate: Date,
     boundaries: ReturnType<typeof calculateMonthlyBoundaries>
 ): number {
     const current = normalizeDate(currentDate)
     const isOnBoundary = isSameDate(current, boundaries.latestBoundary)
+
+    if (isOnBoundary && boundaries.latestBoundaryIndex === 0) {
+        return transactionType === "ไถ่ของ" ? 1 : 0
+    }
 
     return isOnBoundary
         ? boundaries.latestBoundaryIndex
@@ -170,6 +175,8 @@ function getContractStatus(overdueFromContractExpiry: number): string {
 function determineInterestMode(params: {
     promoRate: number
     transactionType: TransactionType
+    monthCount: number
+    actualMonthCount: number
     overdueFromLatestBoundary: number
     overdueFromContractExpiry: number
 }) {
@@ -223,7 +230,7 @@ function determineInterestMode(params: {
         rate: promoRate,
         rateLabel: promoRateLabel,
         method:
-            params.overdueFromLatestBoundary > 0
+            params.monthCount > params.actualMonthCount
                 ? `ปัดเต็มเดือน โปร ${formatPercent(promoRate)}`
                 : `คิดเดือนจริง โปร ${formatPercent(promoRate)}`,
         status: getContractStatus(params.overdueFromContractExpiry),
@@ -318,7 +325,11 @@ export function calculatePawnInterest(
     }
 
     const boundaries = calculateMonthlyBoundaries(startDate, currentDate)
-    const monthCount = calculateStartedMonthCount(currentDate, boundaries)
+    const monthCount = calculateStartedMonthCount(
+        input.transactionType,
+        currentDate,
+        boundaries
+    )
     const actualMonthCount = boundaries.latestBoundaryIndex
     const contractExpiryDate = calculateContractExpiry(startDate)
     const overdueFromLatestBoundary = calculateOverdueDays(
@@ -333,6 +344,8 @@ export function calculatePawnInterest(
     const modeDetails = determineInterestMode({
         promoRate: resolvePromoRate(input),
         transactionType: input.transactionType,
+        monthCount,
+        actualMonthCount,
         overdueFromLatestBoundary,
         overdueFromContractExpiry,
     })

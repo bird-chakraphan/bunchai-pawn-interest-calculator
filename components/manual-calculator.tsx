@@ -180,7 +180,7 @@ function getDatePickerYears(currentDate: Date, selectedDate: Date): number[] {
 
     years.add(selectedYear)
 
-    return Array.from(years).sort((a, b) => b - a)
+    return Array.from(years).sort((a, b) => a - b)
 }
 
 function formatBaht(value: number): string {
@@ -733,9 +733,26 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                                 </div>
                             ) : null}
                             <div className="pawn-field-row">
-                                <label htmlFor={isPrefilled ? undefined : "pawn-start-date"}>
-                                    {renderResponsiveSlashLabel("วันเริ่ม / ต่อดอกล่าสุด")}
-                                </label>
+                                <div className="pawn-field-label-row">
+                                    <label htmlFor={isPrefilled ? undefined : "pawn-start-date"}>
+                                        {renderResponsiveSlashLabel("วันเริ่ม / ต่อดอกล่าสุด")}
+                                    </label>
+                                    {!isPrefilled ? (
+                                        <button
+                                            className="pawn-date-shortcut"
+                                            type="button"
+                                            onClick={() => {
+                                                updateStartDate(currentDate)
+                                                setDatePickerDraft(currentDate)
+                                                setDatePickerStep("day")
+                                                setIsDatePickerOpen(false)
+                                                loanInputRef.current?.focus()
+                                            }}
+                                        >
+                                            เลือกวันนี้
+                                        </button>
+                                    ) : null}
+                                </div>
                                 {isPrefilled ? (
                                     <div className="pawn-control pawn-control-readonly">
                                         {startDate ? formatDate(startDate) : "-"}

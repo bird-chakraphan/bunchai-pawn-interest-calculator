@@ -15,13 +15,25 @@ describe("PublicHomePage", () => {
         expect(screen.getByRole("heading", { name: "คำนวณดอกเบี้ยจำนำ" })).toBeInTheDocument()
         expect(screen.getByText("เลขใบจำนำ")).toBeInTheDocument()
         expect(screen.getByText("เบอร์โทรศัพท์")).toBeInTheDocument()
+        expect(screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ")).toHaveAttribute(
+            "inputmode",
+            "numeric"
+        )
+        expect(screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ")).toHaveAttribute(
+            "maxlength",
+            "5"
+        )
+        expect(screen.getByPlaceholderText("กรอกเบอร์โทรศัพท์")).toHaveAttribute(
+            "inputmode",
+            "numeric"
+        )
         expect(container.querySelector(".pawn-page-notice")).not.toBeInTheDocument()
     })
 
     it("clears lookup state and manual inputs when switching modes", async () => {
         const record = {
             id: "record-1",
-            pawnId: "P-1001",
+            pawnId: "I06767",
             startDate: "2024-05-08",
             loanAmount: 120000,
             promoType: "โปรแสน (1.5%)",
@@ -58,8 +70,8 @@ describe("PublicHomePage", () => {
 
         fireEvent.click(screen.getByRole("button", { name: "ค้นหาด้วยรหัส" }))
 
-        fireEvent.change(screen.getByPlaceholderText("กรอกเลขใบจำนำ"), {
-            target: { value: "P-1001" },
+        fireEvent.change(screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ"), {
+            target: { value: "06767" },
         })
         fireEvent.change(screen.getByPlaceholderText("กรอกเบอร์โทรศัพท์"), {
             target: { value: "0812345678" },
@@ -69,10 +81,15 @@ describe("PublicHomePage", () => {
         await waitFor(() => {
             expect(
                 screen.getByRole("heading", {
-                    name: "คำนวณดอกเบี้ยจำนำ รหัส P-1001",
+                    name: "คำนวณดอกเบี้ยจำนำ",
                 })
             ).toBeInTheDocument()
         })
+
+        expect(screen.getByText("เลขใบจำนำ")).toBeInTheDocument()
+        expect(screen.getByText("I06767")).toBeInTheDocument()
+
+        expect(screen.getByRole("button", { name: "ล้างการค้นหา" }).closest(".pawn-header")).toBeNull()
 
         fireEvent.click(screen.getByRole("button", { name: "กรอกข้อมูล" }))
 
@@ -92,7 +109,7 @@ describe("PublicHomePage", () => {
         fireEvent.click(screen.getByRole("button", { name: "ค้นหาด้วยรหัส" }))
 
         expect(
-            (screen.getByPlaceholderText("กรอกเลขใบจำนำ") as HTMLInputElement).value
+            (screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ") as HTMLInputElement).value
         ).toBe("")
         expect(
             (screen.getByPlaceholderText("กรอกเบอร์โทรศัพท์") as HTMLInputElement).value
@@ -130,8 +147,8 @@ describe("PublicHomePage", () => {
 
         render(<PublicHomePage />)
 
-        fireEvent.change(screen.getByPlaceholderText("กรอกเลขใบจำนำ"), {
-            target: { value: "P-9999" },
+        fireEvent.change(screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ"), {
+            target: { value: "99999" },
         })
         fireEvent.change(screen.getByPlaceholderText("กรอกเบอร์โทรศัพท์"), {
             target: { value: "0812345678" },
@@ -143,5 +160,35 @@ describe("PublicHomePage", () => {
                 screen.getByText("ไม่พบข้อมูลในระบบ กรุณาตรวจสอบเลขใบจำนำและเบอร์โทรศัพท์")
             ).toBeInTheDocument()
         })
+    })
+
+    it("adds the I prefix to a five-digit pawn number before lookup", async () => {
+        const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue({
+            ok: true,
+            status: 200,
+            json: async () => ({ status: "generic_failure" as const }),
+        } as Response)
+
+        render(<PublicHomePage />)
+
+        fireEvent.change(screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ"), {
+            target: { value: "I06767" },
+        })
+        fireEvent.change(screen.getByPlaceholderText("กรอกเบอร์โทรศัพท์"), {
+            target: { value: "0812345678" },
+        })
+        fireEvent.click(screen.getByRole("button", { name: "ค้นหา" }))
+
+        await waitFor(() => {
+            expect(fetchMock).toHaveBeenCalledWith(
+                "/api/customer/lookup",
+                expect.objectContaining({
+                    body: JSON.stringify({ pawnId: "I06767", phone: "0812345678" }),
+                })
+            )
+        })
+        expect(
+            (screen.getByPlaceholderText("กรอกตัวเลข 5 ตัวในใบจำนำ") as HTMLInputElement).value
+        ).toBe("06767")
     })
 })

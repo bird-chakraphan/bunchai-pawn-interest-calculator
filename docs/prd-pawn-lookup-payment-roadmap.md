@@ -28,7 +28,7 @@ The new app will launch in three phases:
 3. Customer online payment for `ต่อดอก` through Omise.
 
 Google Sheet/AppSheet remains the source system for pawn records during MVP.
-Supabase receives scheduled copies of pawn data every 5 minutes. Supabase owns
+Supabase receives scheduled copies of pawn data every 15 minutes. Supabase owns
 app data such as staff accounts, lookup attempts, calculation snapshots, Omise
 payment records, staff review state, LINE notification state, and audit logs.
 
@@ -120,7 +120,7 @@ preserved across all app flows.
   sync logs, calculation snapshots, payments, review tasks, notification state,
   and audit logs.
 - Keep Google Sheet/AppSheet as the MVP source system for pawn records.
-- Sync Google Sheet data into Supabase every 5 minutes.
+- Sync Google Sheet data into Supabase every 15 minutes.
 - The sync should upsert new and edited records by Pawn ID.
 - If a Supabase pawn record disappears from the Google Sheet, mark it
   `archived_from_source` instead of deleting it.

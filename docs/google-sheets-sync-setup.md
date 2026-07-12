@@ -43,7 +43,7 @@ Setup steps:
    - `INTERNAL_SYNC_SECRET`: same value as the app environment variable
    - `PROMO_COLUMN_LETTER`: optional override; default is `AL`
    - `DEFAULT_PROMO_TYPE`: optional fallback, only if `Base Percentage` is blank
-6. Run `installFiveMinuteTrigger` once.
+6. Run `installDualFrequencyTriggers` once.
 7. Run `syncPawnRecords` once manually and confirm it returns `ok: true`.
 8. In the app, open `/staff/sync-health` and verify:
    - latest run is successful
@@ -60,5 +60,10 @@ The source mapping is now complete for calculation:
 - base percentage / promotion
 - customer phone through the Customer sheet join
 
-Before enabling the 5-minute trigger in production, run `syncPawnRecords` once
-manually and review `/staff/sync-health` for invalid source rows.
+Business-hour schedule:
+
+- `08:00` to `17:45`: sync every 15 minutes near `:00`, `:15`, `:30`, `:45`
+- all other times: sync hourly near `:00`
+
+Before enabling the production triggers, run `syncPawnRecords` once manually
+and review `/staff/sync-health` for invalid source rows.
