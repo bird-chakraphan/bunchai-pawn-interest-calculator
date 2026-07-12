@@ -79,14 +79,18 @@ describe("ManualCalculator", () => {
         })
 
         expect(screen.getByRole("radiogroup", { name: "รูปแบบการต่อดอก" })).toBeInTheDocument()
-        expect(screen.getByText("ต่อดอก 2 เดือน ถึงวันที่ 10 ส.ค. 2567")).toBeInTheDocument()
-
-        fireEvent.click(screen.getByRole("radio", { name: "ต่อย้อนหลัง" }))
-
+        expect(screen.getByRole("radio", { name: "ต่อย้อนหลัง" })).toHaveAttribute("aria-checked", "true")
         expect(screen.getByText("ต่อดอก 1 เดือน ถึงวันที่ 10 ก.ค. 2567")).toBeInTheDocument()
         expect(screen.getByText("10,000 × 2% × 1 เดือน")).toBeInTheDocument()
         expect(screen.getByText("200", { selector: "strong" })).toBeInTheDocument()
         expect(screen.getByText("1 เดือน 5 วัน")).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole("radio", { name: "ต่อล่วงหน้า" }))
+
+        expect(screen.getByText("ต่อดอก 2 เดือน ถึงวันที่ 10 ส.ค. 2567")).toBeInTheDocument()
+        expect(
+            screen.getByText("โปร 2% × 2 เดือน ดอกเบี้ย 400 บาท")
+        ).toBeInTheDocument()
     })
 
     it("does not offer backward renewal on an exact monthly boundary", () => {

@@ -299,9 +299,9 @@ function buildExtendOptionEntries(params: {
         })
     }
 
-    if (params.result.monthCount < CONTRACT_DURATION_MONTHS) {
+    if (params.result.actualMonthCount < CONTRACT_DURATION_MONTHS) {
         for (
-            let monthCount = params.result.monthCount + 1;
+            let monthCount = params.result.actualMonthCount + 1;
             monthCount <= CONTRACT_DURATION_MONTHS;
             monthCount += 1
         ) {
@@ -473,7 +473,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
     const [transactionType, setTransactionType] =
         React.useState<TransactionType>("ต่อดอก")
     const [renewalDirection, setRenewalDirection] =
-        React.useState<RenewalDirection>("forward")
+        React.useState<RenewalDirection>("backward")
     const [validationMessages, setValidationMessages] = React.useState<string[]>([])
     const [result, setResult] = React.useState<PawnInterestResult | null>(null)
     const [engineError, setEngineError] = React.useState<string | null>(null)
@@ -537,7 +537,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
         setLoanInput("")
         setPromoType("โปร 2%")
         setTransactionType("ต่อดอก")
-        setRenewalDirection("forward")
+        setRenewalDirection("backward")
         setResult(null)
         setEngineError(null)
         setIsDatePickerOpen(false)
@@ -592,16 +592,23 @@ export function ManualCalculator(props: ManualCalculatorProps) {
         }
 
         try {
+            const calculationInput = {
+                startDate: startDateInput,
+                currentDate: formatDateInputValue(currentDate),
+                loanAmount,
+                promoType,
+                baseRate: props.prefilledRecord?.baseRate,
+                transactionType,
+            }
+            const forwardResult = calculatePawnInterest(calculationInput)
+
             setResult(
-                calculatePawnInterest({
-                    startDate: startDateInput,
-                    currentDate: formatDateInputValue(currentDate),
-                    loanAmount,
-                    promoType,
-                    baseRate: props.prefilledRecord?.baseRate,
-                    transactionType,
-                    renewalDirection,
-                })
+                renewalDirection === "backward" && forwardResult.isBackwardRenewalEligible
+                    ? calculatePawnInterest({
+                          ...calculationInput,
+                          renewalDirection: "backward",
+                      })
+                    : forwardResult
             )
         } catch (error) {
             setResult(null)
@@ -610,12 +617,6 @@ export function ManualCalculator(props: ManualCalculatorProps) {
             )
         }
     }, [currentDate, loanAmount, loanInput, promoType, props.prefilledRecord?.baseRate, renewalDirection, startDate, startDateInput, transactionType])
-
-    React.useEffect(() => {
-        if (renewalDirection === "backward" && !result?.isBackwardRenewalEligible) {
-            setRenewalDirection("forward")
-        }
-    }, [renewalDirection, result?.isBackwardRenewalEligible])
 
     const optionEntries = React.useMemo(() => {
         if (!startDate || !result) {
@@ -1167,7 +1168,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 {props.lookupAction ? (
                     <div className="staff-dual-summary-action">
                         {typeof props.lookupAction === "function"
-                            ? props.lookupAction(renewalDirection)
+                            ? props.lookupAction(result?.renewalDirection ?? "forward")
                             : props.lookupAction}
                     </div>
                 ) : null}
