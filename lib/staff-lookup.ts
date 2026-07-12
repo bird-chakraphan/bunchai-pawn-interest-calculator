@@ -1,6 +1,7 @@
 import {
     calculatePawnInterest,
     type PawnInterestResult,
+    type RenewalDirection,
     type TransactionType,
 } from "@/lib/pawn-interest"
 
@@ -19,6 +20,7 @@ export interface PawnRecord {
 
 interface CalculationEntry {
     transactionType: TransactionType
+    renewalDirection?: RenewalDirection
     result: PawnInterestResult
 }
 
@@ -32,6 +34,7 @@ function buildCalculationEntry(params: {
     record: PawnRecord
     currentDate: string
     transactionType: TransactionType
+    renewalDirection?: RenewalDirection
 }): CalculationEntry {
     return {
         transactionType: params.transactionType,
@@ -45,6 +48,7 @@ function buildCalculationEntry(params: {
                     : "โปร 2%",
             baseRate: params.record.baseRate,
             transactionType: params.transactionType,
+            renewalDirection: params.renewalDirection,
         }),
     }
 }
@@ -52,6 +56,7 @@ function buildCalculationEntry(params: {
 export function buildStaffLookupViewModel(params: {
     record: PawnRecord
     currentDate: string
+    renewalDirection?: RenewalDirection
 }): StaffLookupViewModel {
     return {
         record: params.record,
@@ -59,6 +64,7 @@ export function buildStaffLookupViewModel(params: {
             record: params.record,
             currentDate: params.currentDate,
             transactionType: "ต่อดอก",
+            renewalDirection: params.renewalDirection,
         }),
         redeem: buildCalculationEntry({
             record: params.record,

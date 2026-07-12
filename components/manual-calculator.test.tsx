@@ -66,6 +66,43 @@ describe("ManualCalculator", () => {
         expect(screen.getByText("0 เดือน 0 วัน")).toBeInTheDocument()
     })
 
+    it("offers backward renewal for months 1 to 3 and days 1 to 7", () => {
+        vi.setSystemTime(new Date("2024-07-15T12:00:00"))
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+        fireEvent.click(screen.getByRole("button", { name: "2567" }))
+        fireEvent.click(screen.getByRole("button", { name: "มิ.ย." }))
+        fireEvent.click(screen.getByRole("button", { name: "10" }))
+        fireEvent.change(screen.getByLabelText("ยอดจำนำ"), {
+            target: { value: "10000" },
+        })
+
+        expect(screen.getByRole("radiogroup", { name: "รูปแบบการต่อดอก" })).toBeInTheDocument()
+        expect(screen.getByText("ต่อดอก 2 เดือน ถึงวันที่ 10 ส.ค. 2567")).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole("radio", { name: "ต่อย้อนหลัง" }))
+
+        expect(screen.getByText("ต่อดอก 1 เดือน ถึงวันที่ 10 ก.ค. 2567")).toBeInTheDocument()
+        expect(screen.getByText("10,000 × 2% × 1 เดือน")).toBeInTheDocument()
+        expect(screen.getByText("200", { selector: "strong" })).toBeInTheDocument()
+        expect(screen.getByText("1 เดือน 5 วัน")).toBeInTheDocument()
+    })
+
+    it("does not offer backward renewal on an exact monthly boundary", () => {
+        render(<ManualCalculator />)
+
+        fireEvent.click(screen.getByLabelText("วันเริ่ม / ต่อดอกล่าสุด"))
+        fireEvent.click(screen.getByRole("button", { name: "2567" }))
+        fireEvent.click(screen.getByRole("button", { name: "มิ.ย." }))
+        fireEvent.click(screen.getByRole("button", { name: "10" }))
+        fireEvent.change(screen.getByLabelText("ยอดจำนำ"), {
+            target: { value: "10000" },
+        })
+
+        expect(screen.queryByRole("radiogroup", { name: "รูปแบบการต่อดอก" })).not.toBeInTheDocument()
+    })
+
     it("shows validation for invalid input", async () => {
         render(<ManualCalculator />)
 
@@ -145,6 +182,7 @@ describe("ManualCalculator", () => {
                     startDate: "2024-06-10",
                     loanAmount: 10000,
                     promoType: "โปร 2%",
+                    baseRate: 0.02,
                 }}
                 staffLookupViewModel={{
                     record: {
@@ -153,6 +191,7 @@ describe("ManualCalculator", () => {
                         startDate: "2024-06-10",
                         loanAmount: 10000,
                         promoType: "โปร 2%",
+                        baseRate: 0.02,
                         customerPhone: "0812345678",
                         archivedFromSource: false,
                         sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
@@ -224,6 +263,7 @@ describe("ManualCalculator", () => {
                     startDate: "2024-06-10",
                     loanAmount: 10000,
                     promoType: "โปร 2%",
+                    baseRate: 0.02,
                 }}
                 staffLookupViewModel={{
                     record: {
@@ -232,6 +272,7 @@ describe("ManualCalculator", () => {
                         startDate: "2024-06-10",
                         loanAmount: 10000,
                         promoType: "โปร 2%",
+                        baseRate: 0.02,
                         customerPhone: "0812345678",
                         archivedFromSource: true,
                         sourceUpdatedAt: "2024-07-01T10:00:00.000Z",

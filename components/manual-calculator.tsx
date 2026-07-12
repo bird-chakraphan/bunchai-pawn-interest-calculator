@@ -5,6 +5,7 @@ import {
     calculatePawnInterest,
     type PawnInterestResult,
     type PromoType,
+    type RenewalDirection,
     type TransactionType,
 } from "@/lib/pawn-interest"
 import type { StaffLookupViewModel } from "@/lib/staff-lookup"
@@ -37,7 +38,7 @@ interface ManualCalculatorProps {
     prefilledRecord?: PrefilledRecord | null
     staffLookupViewModel?: StaffLookupViewModel | null
     showStaffLookupMetadata?: boolean
-    lookupAction?: React.ReactNode
+    lookupAction?: React.ReactNode | ((renewalDirection: RenewalDirection) => React.ReactNode)
     bottomAction?: React.ReactNode
     hideCalculatorBody?: boolean
     resetVersion?: number
@@ -51,6 +52,11 @@ const PROMO_OPTIONS: Array<{ label: string; value: PromoType }> = [
 const TRANSACTION_OPTIONS: Array<{ label: string; value: TransactionType }> = [
     { label: "ต่อดอก", value: "ต่อดอก" },
     { label: "ไถ่ของ", value: "ไถ่ของ" },
+]
+
+const RENEWAL_DIRECTION_OPTIONS: Array<{ label: string; value: RenewalDirection }> = [
+    { label: "ต่อย้อนหลัง", value: "backward" },
+    { label: "ต่อล่วงหน้า", value: "forward" },
 ]
 
 const THAI_MONTH_LABELS = [
@@ -466,6 +472,8 @@ export function ManualCalculator(props: ManualCalculatorProps) {
     const [promoType, setPromoType] = React.useState<PromoType>("โปร 2%")
     const [transactionType, setTransactionType] =
         React.useState<TransactionType>("ต่อดอก")
+    const [renewalDirection, setRenewalDirection] =
+        React.useState<RenewalDirection>("forward")
     const [validationMessages, setValidationMessages] = React.useState<string[]>([])
     const [result, setResult] = React.useState<PawnInterestResult | null>(null)
     const [engineError, setEngineError] = React.useState<string | null>(null)
@@ -529,6 +537,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
         setLoanInput("")
         setPromoType("โปร 2%")
         setTransactionType("ต่อดอก")
+        setRenewalDirection("forward")
         setResult(null)
         setEngineError(null)
         setIsDatePickerOpen(false)
@@ -591,6 +600,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                     promoType,
                     baseRate: props.prefilledRecord?.baseRate,
                     transactionType,
+                    renewalDirection,
                 })
             )
         } catch (error) {
@@ -599,7 +609,13 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 error instanceof Error ? error.message : "เกิดข้อผิดพลาดในการคำนวณ"
             )
         }
-    }, [currentDate, loanAmount, loanInput, promoType, props.prefilledRecord?.baseRate, startDate, startDateInput, transactionType])
+    }, [currentDate, loanAmount, loanInput, promoType, props.prefilledRecord?.baseRate, renewalDirection, startDate, startDateInput, transactionType])
+
+    React.useEffect(() => {
+        if (renewalDirection === "backward" && !result?.isBackwardRenewalEligible) {
+            setRenewalDirection("forward")
+        }
+    }, [renewalDirection, result?.isBackwardRenewalEligible])
 
     const optionEntries = React.useMemo(() => {
         if (!startDate || !result) {
@@ -984,7 +1000,7 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                                 )}
                             </div>
 
-                            <div className="pawn-field-row pawn-field-row-last">
+                            <div className={`pawn-field-row ${result?.isBackwardRenewalEligible && transactionType === "ต่อดอก" ? "" : "pawn-field-row-last"}`}>
                                 <label>
                                     <span>รายการ</span>
                                 </label>
@@ -1006,6 +1022,28 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                                     })}
                                 </div>
                             </div>
+                            {result?.isBackwardRenewalEligible && transactionType === "ต่อดอก" ? (
+                                <div className="pawn-field-row pawn-field-row-last">
+                                    <label><span>รูปแบบการต่อดอก</span></label>
+                                    <div className="pawn-segmented" role="radiogroup" aria-label="รูปแบบการต่อดอก">
+                                        {RENEWAL_DIRECTION_OPTIONS.map((option) => {
+                                            const isSelected = renewalDirection === option.value
+                                            return (
+                                                <button
+                                                    key={option.value}
+                                                    type="button"
+                                                    role="radio"
+                                                    aria-checked={isSelected}
+                                                    className={isSelected ? "is-selected" : ""}
+                                                    onClick={() => setRenewalDirection(option.value)}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            ) : null}
                         </div>
 
                         <div className="pawn-result-wrap">
@@ -1127,7 +1165,11 @@ export function ManualCalculator(props: ManualCalculatorProps) {
                 ) : null}
 
                 {props.lookupAction ? (
-                    <div className="staff-dual-summary-action">{props.lookupAction}</div>
+                    <div className="staff-dual-summary-action">
+                        {typeof props.lookupAction === "function"
+                            ? props.lookupAction(renewalDirection)
+                            : props.lookupAction}
+                    </div>
                 ) : null}
 
                 {props.bottomAction ? (

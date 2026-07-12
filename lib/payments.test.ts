@@ -35,6 +35,8 @@ const lookupViewModel: StaffLookupViewModel = {
             overdueFromLatestBoundary: 0,
             overdueFromContractExpiry: 0,
             formulaText: "10,000 × 2% × 1 เดือน",
+            renewalDirection: "forward",
+            isBackwardRenewalEligible: false,
         },
     },
     redeem: {
@@ -55,6 +57,8 @@ const lookupViewModel: StaffLookupViewModel = {
             overdueFromLatestBoundary: 0,
             overdueFromContractExpiry: 0,
             formulaText: "10,000 × 2% × 1 เดือน",
+            renewalDirection: "forward",
+            isBackwardRenewalEligible: false,
         },
     },
 }
@@ -71,6 +75,7 @@ describe("buildPendingExtendPayment", () => {
         expect(payment.paymentStatus).toBe("pending_payment")
         expect(payment.renewalStatus).toBe("none")
         expect(payment.calculationSnapshot.transactionType).toBe("ต่อดอก")
+        expect(payment.calculationSnapshot.renewalDirection).toBe("forward")
         expect(payment.calculationSnapshot.result.formulaText).toBe("10,000 × 2% × 1 เดือน")
     })
 })

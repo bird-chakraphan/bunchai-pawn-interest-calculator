@@ -1,4 +1,5 @@
 import type { PawnRecord, StaffLookupViewModel } from "@/lib/staff-lookup"
+import type { RenewalDirection } from "@/lib/pawn-interest"
 
 export interface PendingExtendPaymentDraft {
     pawnRecordId: string
@@ -12,6 +13,7 @@ export interface PendingExtendPaymentDraft {
     startDateBeforePayment: string
     calculationSnapshot: {
         transactionType: "ต่อดอก"
+        renewalDirection: RenewalDirection
         result: StaffLookupViewModel["extend"]["result"]
     }
 }
@@ -38,6 +40,8 @@ export function buildPendingExtendPayment(params: {
         startDateBeforePayment: params.record.startDate,
         calculationSnapshot: {
             transactionType: "ต่อดอก",
+            renewalDirection:
+                params.lookupViewModel.extend.result.renewalDirection ?? "forward",
             result: params.lookupViewModel.extend.result,
         },
     }

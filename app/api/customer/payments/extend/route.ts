@@ -5,6 +5,8 @@ import { arePaymentsEnabled, getOmiseEnv } from "@/lib/supabase/env"
 import { getPawnRecordById } from "@/lib/pawn-records"
 import { buildPendingExtendPayment } from "@/lib/payments"
 import { createOmisePaymentLink } from "@/lib/omise"
+import { buildStaffLookupViewModel } from "@/lib/staff-lookup"
+import type { RenewalDirection } from "@/lib/pawn-interest"
 
 export async function POST(request: NextRequest) {
     if (!arePaymentsEnabled()) {
@@ -34,10 +36,16 @@ export async function POST(request: NextRequest) {
     const body = (await request.json()) as {
         pawnId?: string
         phone?: string
+        renewalDirection?: RenewalDirection
     }
 
     const pawnId = String(body.pawnId ?? "").trim()
     const phone = String(body.phone ?? "").trim()
+    const renewalDirection = body.renewalDirection ?? "forward"
+
+    if (renewalDirection !== "forward" && renewalDirection !== "backward") {
+        return NextResponse.json({ error: "Invalid renewal direction" }, { status: 400 })
+    }
 
     if (!pawnId || !phone) {
         return NextResponse.json(
@@ -51,19 +59,39 @@ export async function POST(request: NextRequest) {
         pawnId,
     })
 
+    const currentDate = new Date().toISOString().slice(0, 10)
     const lookupOutcome = buildCustomerLookupOutcome({
         record,
         enteredPhone: phone,
-        currentDate: new Date().toISOString().slice(0, 10),
+        currentDate,
     })
 
     if (lookupOutcome.status !== "success") {
         return NextResponse.json({ status: lookupOutcome.status })
     }
 
+    let paymentLookupViewModel
+
+    try {
+        paymentLookupViewModel = buildStaffLookupViewModel({
+            record: lookupOutcome.record,
+            currentDate,
+            renewalDirection,
+        })
+    } catch (error) {
+        return NextResponse.json(
+            {
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : "Invalid renewal calculation",
+            },
+            { status: 400 }
+        )
+    }
     const paymentDraft = buildPendingExtendPayment({
         record: lookupOutcome.record,
-        lookupViewModel: lookupOutcome.lookupViewModel,
+        lookupViewModel: paymentLookupViewModel,
     })
 
     const { data: paymentRow, error: paymentInsertError } = await supabase

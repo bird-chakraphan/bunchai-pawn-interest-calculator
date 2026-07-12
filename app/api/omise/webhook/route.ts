@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
         let paymentLookup = supabase
             .from("payments")
-            .select("id, pawn_id_snapshot, amount, payment_status")
+            .select("id, pawn_id_snapshot, amount, payment_status, calculation_snapshot")
 
         if (metadataPaymentId) {
             paymentLookup = paymentLookup.eq("id", metadataPaymentId)
@@ -161,7 +161,14 @@ export async function POST(request: NextRequest) {
         }
 
         const paidAt = new Date().toISOString()
-        const effectiveRenewalDate = paidAt.slice(0, 10)
+        const calculationSnapshot = paymentLookupResult.data.calculation_snapshot as {
+            result?: { nextBoundary?: string }
+        } | null
+        const effectiveRenewalDate = calculationSnapshot?.result?.nextBoundary
+
+        if (!effectiveRenewalDate) {
+            throw new Error("Payment calculation snapshot is missing renewal date")
+        }
 
         const paymentUpdateResult = await supabase
             .from("payments")

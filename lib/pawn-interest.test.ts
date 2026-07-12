@@ -70,6 +70,43 @@ describe("calculatePawnInterest", () => {
         expect(result.overdueFromLatestBoundary).toBe(1)
         expect(result.interestAmount).toBe(400)
         expect(result.method).toBe("ปัดเต็มเดือน โปร 2%")
+        expect(result.isBackwardRenewalEligible).toBe(true)
+    })
+
+    it("calculates an eligible backward renewal one month earlier", () => {
+        const result = calculatePawnInterest({
+            startDate: "2024-05-10",
+            currentDate: "2024-07-15",
+            loanAmount: 10000,
+            promoType: "โปร 2%",
+            transactionType: "ต่อดอก",
+            renewalDirection: "backward",
+        })
+
+        expect(result.renewalDirection).toBe("backward")
+        expect(result.monthCount).toBe(2)
+        expect(result.actualMonthCount).toBe(2)
+        expect(result.overdueFromLatestBoundary).toBe(5)
+        expect(result.nextBoundary).toBe("2024-07-10")
+        expect(result.interestAmount).toBe(400)
+        expect(result.formulaText).toBe("10,000 × 2% × 2 เดือน")
+    })
+
+    it.each([
+        ["2024-06-10", "2024-07-10"],
+        ["2024-06-10", "2024-07-18"],
+        ["2024-03-10", "2024-07-15"],
+    ])("rejects an ineligible backward renewal from %s on %s", (startDate, currentDate) => {
+        expect(() =>
+            calculatePawnInterest({
+                startDate,
+                currentDate,
+                loanAmount: 10000,
+                promoType: "โปร 2%",
+                transactionType: "ต่อดอก",
+                renewalDirection: "backward",
+            })
+        ).toThrow("Backward renewal is not available for this duration")
     })
 
     it("uses end-of-month fallback for leap-year anniversaries", () => {

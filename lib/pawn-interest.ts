@@ -1,5 +1,6 @@
 export type PromoType = "โปร 2%" | "โปรแสน (1.5%)"
 export type TransactionType = "ต่อดอก" | "ไถ่ของ"
+export type RenewalDirection = "forward" | "backward"
 export type InterestMode =
     | "monthlyPromo"
     | "weeklyOnePercent"
@@ -13,6 +14,7 @@ export interface PawnInterestInput {
     promoType: PromoType
     baseRate?: number
     transactionType: TransactionType
+    renewalDirection?: RenewalDirection
 }
 
 export interface PawnInterestResult {
@@ -33,6 +35,8 @@ export interface PawnInterestResult {
     overdueFromLatestBoundary: number
     overdueFromContractExpiry: number
     formulaText: string
+    renewalDirection?: RenewalDirection
+    isBackwardRenewalEligible?: boolean
 }
 
 const PROMO_RATES: Record<PromoType, number> = {
@@ -325,7 +329,7 @@ export function calculatePawnInterest(
     }
 
     const boundaries = calculateMonthlyBoundaries(startDate, currentDate)
-    const monthCount = calculateStartedMonthCount(
+    const forwardMonthCount = calculateStartedMonthCount(
         input.transactionType,
         currentDate,
         boundaries
@@ -340,6 +344,20 @@ export function calculatePawnInterest(
         compareDates(currentDate, contractExpiryDate) > 0
             ? calculateOverdueDays(contractExpiryDate, currentDate)
             : 0
+    const isBackwardRenewalEligible =
+        input.transactionType === "ต่อดอก" &&
+        actualMonthCount >= 1 &&
+        actualMonthCount <= CONTRACT_DURATION_MONTHS &&
+        overdueFromLatestBoundary >= 1 &&
+        overdueFromLatestBoundary <= 7
+    const renewalDirection = input.renewalDirection ?? "forward"
+
+    if (renewalDirection === "backward" && !isBackwardRenewalEligible) {
+        throw new Error("Backward renewal is not available for this duration")
+    }
+
+    const monthCount =
+        renewalDirection === "backward" ? forwardMonthCount - 1 : forwardMonthCount
 
     const modeDetails = determineInterestMode({
         promoRate: resolvePromoRate(input),
@@ -369,7 +387,11 @@ export function calculatePawnInterest(
                 ? overdueFromContractExpiry
                 : overdueFromLatestBoundary,
         latestBoundary: formatOutputDate(boundaries.latestBoundary),
-        nextBoundary: formatOutputDate(boundaries.nextBoundary),
+        nextBoundary: formatOutputDate(
+            renewalDirection === "backward"
+                ? boundaries.latestBoundary
+                : boundaries.nextBoundary
+        ),
         contractExpiryDate: formatOutputDate(contractExpiryDate),
         overdueFromLatestBoundary,
         overdueFromContractExpiry,
@@ -381,5 +403,7 @@ export function calculatePawnInterest(
             mode: modeDetails.mode,
             rate: modeDetails.rate,
         }),
+        renewalDirection,
+        isBackwardRenewalEligible,
     }
 }

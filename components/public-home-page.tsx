@@ -3,6 +3,7 @@
 import * as React from "react"
 import { ManualCalculator } from "@/components/manual-calculator"
 import type { StaffLookupViewModel } from "@/lib/staff-lookup"
+import type { RenewalDirection } from "@/lib/pawn-interest"
 
 interface PublicLookupRecord {
     pawnId: string
@@ -132,7 +133,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
         setMode(nextMode)
     }
 
-    async function handleExtendPayment() {
+    async function handleExtendPayment(renewalDirection: RenewalDirection) {
         setPaymentState({
             isLoading: true,
             error: null,
@@ -146,6 +147,7 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
             body: JSON.stringify({
                 pawnId: fullPawnId,
                 phone,
+                renewalDirection,
             }),
         })
 
@@ -269,13 +271,15 @@ export function PublicHomePage(props: { paymentsEnabled?: boolean }) {
             staffLookupViewModel={successResult?.lookupViewModel ?? null}
             lookupAction={
                 successResult && props.paymentsEnabled ? (
-                    <button
-                        className="staff-primary-button"
-                        type="button"
-                        onClick={handleExtendPayment}
-                    >
-                        {paymentState.isLoading ? "กำลังเชื่อมไปหน้าชำระเงิน..." : "ชำระต่อดอกออนไลน์"}
-                    </button>
+                    (renewalDirection) => (
+                        <button
+                            className="staff-primary-button"
+                            type="button"
+                            onClick={() => handleExtendPayment(renewalDirection)}
+                        >
+                            {paymentState.isLoading ? "กำลังเชื่อมไปหน้าชำระเงิน..." : "ชำระต่อดอกออนไลน์"}
+                        </button>
+                    )
                 ) : null
             }
             bottomAction={
