@@ -16,6 +16,7 @@ describe("prepareSyncRows", () => {
                 loanAmount: 10000,
                 promoType: "โปร 1%",
                 baseRate: 0.01,
+                sourceStatus: "ยังอยู่ในกำหนด",
                 sourceUpdatedAt: null,
             },
             {
@@ -26,6 +27,7 @@ describe("prepareSyncRows", () => {
                 loanAmount: 12000,
                 promoType: "โปร 2%",
                 baseRate: 0.02,
+                sourceStatus: "ยังอยู่ในกำหนด",
                 sourceUpdatedAt: null,
             },
             {
@@ -36,6 +38,7 @@ describe("prepareSyncRows", () => {
                 loanAmount: 10000,
                 promoType: "โปร 2%",
                 baseRate: 0.02,
+                sourceStatus: "ยังอยู่ในกำหนด",
                 sourceUpdatedAt: null,
             },
         ]
@@ -51,6 +54,7 @@ describe("prepareSyncRows", () => {
                 loanAmount: 10000,
                 promoType: "โปร 1%",
                 baseRate: 0.01,
+                sourceStatus: "ยังอยู่ในกำหนด",
                 sourceUpdatedAt: null,
             },
         ])
@@ -65,6 +69,50 @@ describe("prepareSyncRows", () => {
                 rowIndex: 4,
                 pawnIdRaw: "",
                 reason: "Missing Pawn ID",
+                severity: "error",
+            }),
+        ])
+    })
+
+    it("logs rows with unknown source statuses as issues", () => {
+        const rows: IncomingSyncRow[] = [
+            {
+                rowIndex: 2,
+                pawnId: "P-1001",
+                customerPhone: "0812345678",
+                startDate: "2024-06-10",
+                loanAmount: 10000,
+                promoType: "โปร 2%",
+                baseRate: 0.02,
+                sourceStatus: "ยังอยู่ในกำหนด",
+                sourceUpdatedAt: null,
+            },
+            {
+                rowIndex: 3,
+                pawnId: "P-1002",
+                customerPhone: "0822222222",
+                startDate: "2024-06-10",
+                loanAmount: 20000,
+                promoType: "โปร 2%",
+                baseRate: 0.02,
+                sourceStatus: "รอตรวจสอบ",
+                sourceUpdatedAt: null,
+            },
+        ]
+
+        const result = prepareSyncRows(rows)
+
+        expect(result.validRows).toEqual([
+            expect.objectContaining({
+                pawnId: "P-1001",
+                sourceStatus: "ยังอยู่ในกำหนด",
+            }),
+        ])
+        expect(result.issues).toEqual([
+            expect.objectContaining({
+                rowIndex: 3,
+                pawnIdRaw: "P-1002",
+                reason: "Invalid source status",
                 severity: "error",
             }),
         ])

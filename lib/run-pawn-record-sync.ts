@@ -72,6 +72,7 @@ export async function runPawnRecordSync(params: {
                 loan_amount: row.loanAmount,
                 promo_type: row.promoType,
                 base_rate: row.baseRate,
+                source_status: row.sourceStatus,
                 archived_from_source: false,
                 source_updated_at: row.sourceUpdatedAt,
                 last_synced_at: nowIso,

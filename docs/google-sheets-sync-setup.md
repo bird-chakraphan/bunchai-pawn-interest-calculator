@@ -22,10 +22,15 @@ Loan tab:
 | `customerPhone` | join `Loan Stock!AM` to `Customer!A`, then use `Customer!F` / `Phone Number` |
 | `baseRate` | `Loan Stock!AL` / `Base Percentage` |
 | `promoType` | display label derived from `Base Percentage`, such as `โปร 1%`, `โปร 1.5%`, or `โปร 2%` |
+| `sourceStatus` | `Loan Stock!AZ` / `Status` |
 
 Important: `Base Percentage` is the source of truth for calculation. The sync
 script stores it as `baseRate`, so source values like `1%`, `1.5%`, `2%`,
 `0.01`, `0.015`, and `0.02` are calculated directly.
+
+Only rows whose `Status` is exactly `ยังอยู่ในกำหนด` are searchable in the app.
+Rows with `ไถ่แล้ว` or `เอาขาด` still sync into Supabase for traceability, but
+shared lookup paths treat them as not found.
 
 ## Apps Script
 

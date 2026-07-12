@@ -2,7 +2,7 @@ import Link from "next/link"
 import { ManualCalculator } from "@/components/manual-calculator"
 import { StaffTitleMenu } from "@/components/staff-title-menu"
 import { signOutAction } from "@/app/staff/sign-in/actions"
-import { getPawnRecordById } from "@/lib/pawn-records"
+import { getStaffPawnLookupById } from "@/lib/pawn-records"
 import { buildStaffLookupViewModel } from "@/lib/staff-lookup"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 export const dynamic = "force-dynamic"
@@ -25,10 +25,13 @@ export default async function StaffHomePage(props: {
     let lookupError: string | null = null
     let record = null
     let staffLookupViewModel = null
+    let lookupStatus: "redeemed" | "expired" | "not_found" | null = null
 
     if (pawnId && supabase) {
         try {
-            record = await getPawnRecordById({ supabase, pawnId })
+            const lookupResult = await getStaffPawnLookupById({ supabase, pawnId })
+            record = lookupResult.status === "active" ? lookupResult.record : null
+            lookupStatus = lookupResult.status === "active" ? null : lookupResult.status
             if (record) {
                 staffLookupViewModel = buildStaffLookupViewModel({
                     record,
@@ -97,9 +100,17 @@ export default async function StaffHomePage(props: {
             notice={
                 lookupError ? (
                     <div className="staff-auth-message is-error">{lookupError}</div>
-                ) : pawnId && !record ? (
+                ) : lookupStatus === "expired" ? (
                     <div className="staff-auth-message">
-                        ไม่พบข้อมูล Pawn ID นี้ในฐานข้อมูล
+                        หมายเลขของจำใบนี้พ้นกำหนดเวลาแล้ว กรุณาติดต่อร้าน
+                    </div>
+                ) : lookupStatus === "redeemed" ? (
+                    <div className="staff-auth-message">
+                        หมายเลขของจำใบนี้ถูกไถ่จากระบบแล้ว
+                    </div>
+                ) : lookupStatus === "not_found" ? (
+                    <div className="staff-auth-message">
+                        ไม่พบข้อมูลหมายเลขของจำนี้ในฐานข้อมูล
                     </div>
                 ) : null
             }

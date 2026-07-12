@@ -1,4 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
+import {
+    SEARCHABLE_PAWN_RECORD_STATUS,
+    type PawnRecordSourceStatus,
+} from "@/lib/pawn-record-status"
 import type { PawnRecord } from "@/lib/staff-lookup"
 
 interface PawnRecordRow {
@@ -9,10 +13,15 @@ interface PawnRecordRow {
     loan_amount: number | string
     promo_type: string
     base_rate: number | string | null
+    source_status?: PawnRecordSourceStatus | null
     archived_from_source: boolean
     source_updated_at: string | null
     last_synced_at: string | null
 }
+
+export type StaffPawnLookupResult =
+    | { status: "active"; record: PawnRecord }
+    | { status: "redeemed" | "expired" | "not_found" }
 
 function normalizeLoanAmount(value: number | string): number {
     const parsedValue =
@@ -75,6 +84,8 @@ export async function getPawnRecordById(params: {
             "id, pawn_id, customer_phone, start_date, loan_amount, promo_type, base_rate, archived_from_source, source_updated_at, last_synced_at"
         )
         .eq("pawn_id", params.pawnId)
+        .eq("source_status", SEARCHABLE_PAWN_RECORD_STATUS)
+        .eq("archived_from_source", false)
         .maybeSingle<PawnRecordRow>()
 
     if (error) {
@@ -86,4 +97,40 @@ export async function getPawnRecordById(params: {
     }
 
     return mapPawnRecordRow(data)
+}
+
+export async function getStaffPawnLookupById(params: {
+    supabase: SupabaseClient
+    pawnId: string
+}): Promise<StaffPawnLookupResult> {
+    const { data, error } = await params.supabase
+        .from("pawn_records")
+        .select(
+            "id, pawn_id, customer_phone, start_date, loan_amount, promo_type, base_rate, source_status, archived_from_source, source_updated_at, last_synced_at"
+        )
+        .eq("pawn_id", params.pawnId)
+        .eq("archived_from_source", false)
+        .maybeSingle<PawnRecordRow>()
+
+    if (error) {
+        throw new Error(error.message)
+    }
+
+    if (!data) {
+        return { status: "not_found" }
+    }
+
+    if (data.source_status === SEARCHABLE_PAWN_RECORD_STATUS) {
+        return { status: "active", record: mapPawnRecordRow(data) }
+    }
+
+    if (data.source_status === "ไถ่แล้ว") {
+        return { status: "redeemed" }
+    }
+
+    if (data.source_status === "เอาขาด") {
+        return { status: "expired" }
+    }
+
+    return { status: "not_found" }
 }

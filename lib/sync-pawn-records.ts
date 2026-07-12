@@ -1,4 +1,5 @@
 import { normalizePhoneNumber } from "@/lib/phone"
+import { isPawnRecordSourceStatus, type PawnRecordSourceStatus } from "@/lib/pawn-record-status"
 
 export interface IncomingSyncRow {
     rowIndex: number
@@ -8,6 +9,7 @@ export interface IncomingSyncRow {
     loanAmount: number
     promoType: string
     baseRate: number
+    sourceStatus: string
     sourceUpdatedAt: string | null
 }
 
@@ -19,8 +21,12 @@ export interface SyncRunIssueInput {
     rawRow: Record<string, unknown>
 }
 
+export interface ValidatedSyncRow extends Omit<IncomingSyncRow, "sourceStatus"> {
+    sourceStatus: PawnRecordSourceStatus
+}
+
 interface PrepareSyncRowsResult {
-    validRows: IncomingSyncRow[]
+    validRows: ValidatedSyncRow[]
     issues: SyncRunIssueInput[]
 }
 
@@ -65,7 +71,7 @@ function validateRow(row: IncomingSyncRow): SyncRunIssueInput | null {
 
 export function prepareSyncRows(rows: IncomingSyncRow[]): PrepareSyncRowsResult {
     const issues: SyncRunIssueInput[] = []
-    const validRows: IncomingSyncRow[] = []
+    const validRows: ValidatedSyncRow[] = []
     const seenPawnIds = new Set<string>()
 
     for (const row of rows) {
@@ -73,6 +79,11 @@ export function prepareSyncRows(rows: IncomingSyncRow[]): PrepareSyncRowsResult 
 
         if (validationIssue) {
             issues.push(validationIssue)
+            continue
+        }
+
+        if (!isPawnRecordSourceStatus(row.sourceStatus)) {
+            issues.push(toIssue(row, "Invalid source status"))
             continue
         }
 
@@ -88,6 +99,7 @@ export function prepareSyncRows(rows: IncomingSyncRow[]): PrepareSyncRowsResult 
             ...row,
             pawnId: normalizedPawnId,
             customerPhone: normalizePhoneNumber(row.customerPhone),
+            sourceStatus: row.sourceStatus,
         })
     }
 

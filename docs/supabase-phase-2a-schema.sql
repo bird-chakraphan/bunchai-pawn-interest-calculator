@@ -6,6 +6,7 @@ create table if not exists public.pawn_records (
     loan_amount numeric(12, 2) not null check (loan_amount > 0),
     promo_type text not null,
     base_rate numeric(8, 6) not null default 0.02 check (base_rate > 0),
+    source_status text,
     archived_from_source boolean not null default false,
     source_updated_at timestamptz,
     last_synced_at timestamptz,
@@ -17,10 +18,23 @@ alter table public.pawn_records
     add column if not exists base_rate numeric(8, 6) not null default 0.02 check (base_rate > 0);
 
 alter table public.pawn_records
+    add column if not exists source_status text;
+
+alter table public.pawn_records
     alter column promo_type type text;
 
 alter table public.pawn_records
     drop constraint if exists pawn_records_promo_type_check;
+
+alter table public.pawn_records
+    drop constraint if exists pawn_records_source_status_check;
+
+alter table public.pawn_records
+    add constraint pawn_records_source_status_check
+    check (
+        source_status is null
+        or source_status in ('ไถ่แล้ว', 'เอาขาด', 'ยังอยู่ในกำหนด')
+    );
 
 update public.pawn_records
 set base_rate = case
@@ -37,6 +51,9 @@ create index if not exists pawn_records_pawn_id_idx
 
 create index if not exists pawn_records_archived_from_source_idx
     on public.pawn_records (archived_from_source);
+
+create index if not exists pawn_records_search_lookup_idx
+    on public.pawn_records (pawn_id, source_status, archived_from_source);
 
 create table if not exists public.staff_profiles (
     id uuid primary key references auth.users (id) on delete cascade,

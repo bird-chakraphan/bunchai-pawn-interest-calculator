@@ -25,6 +25,7 @@ const CONFIG = {
     CUSTOMER_ID_COLUMN_IN_LOAN_STOCK: "AM",
     PROMO_COLUMN: "AL",
     LATEST_RENEWAL_DATE_COLUMN: "AP",
+    STATUS_COLUMN: "AZ",
     CUSTOMER_ID_COLUMN_IN_CUSTOMER: "A",
     CUSTOMER_PHONE_COLUMN: "F",
     FIRST_DATA_ROW: 2,
@@ -178,6 +179,7 @@ function buildPawnRows_(sheet, customerPhoneById, options) {
     const amountColumn = columnToIndex_(CONFIG.LOAN_AMOUNT_COLUMN)
     const customerIdColumn = columnToIndex_(CONFIG.CUSTOMER_ID_COLUMN_IN_LOAN_STOCK)
     const renewalDateColumn = columnToIndex_(CONFIG.LATEST_RENEWAL_DATE_COLUMN)
+    const statusColumn = columnToIndex_(CONFIG.STATUS_COLUMN)
     const promoColumn = options.promoColumnLetter
         ? columnToIndex_(options.promoColumnLetter)
         : null
@@ -186,6 +188,7 @@ function buildPawnRows_(sheet, customerPhoneById, options) {
         amountColumn,
         customerIdColumn,
         renewalDateColumn,
+        statusColumn,
         promoColumn || 1
     )
     const values = sheet
@@ -207,6 +210,7 @@ function buildPawnRows_(sheet, customerPhoneById, options) {
             loanAmount: parseLoanAmount_(row[amountColumn - 1]),
             promoType: formatPromoLabel_(baseRate),
             baseRate,
+            sourceStatus: normalizeString_(row[statusColumn - 1]),
             sourceUpdatedAt: null,
         }
     })
