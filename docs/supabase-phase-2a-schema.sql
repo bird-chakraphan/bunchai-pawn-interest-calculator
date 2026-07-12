@@ -33,7 +33,14 @@ alter table public.pawn_records
     add constraint pawn_records_source_status_check
     check (
         source_status is null
-        or source_status in ('ไถ่แล้ว', 'เอาขาด', 'ยังอยู่ในกำหนด')
+        or source_status in (
+            'ไถ่แล้ว',
+            'เอาขาด',
+            'ขาดแล้ว',
+            'ยังอยู่ในกำหนด',
+            'ช่วงผ่อนผัน',
+            'วันสุดท้าย'
+        )
     );
 
 update public.pawn_records

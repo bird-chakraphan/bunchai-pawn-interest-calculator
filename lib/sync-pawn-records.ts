@@ -117,3 +117,9 @@ export function buildArchivedPawnIds(params: {
 
     return params.existingPawnIds.filter((pawnId) => !incomingPawnIds.has(pawnId))
 }
+
+export function getIncomingPawnIds(rows: IncomingSyncRow[]): string[] {
+    return rows
+        .map((row) => normalizePawnId(row.pawnId))
+        .filter(Boolean)
+}

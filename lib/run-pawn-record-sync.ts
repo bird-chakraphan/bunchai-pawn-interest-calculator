@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import {
     buildArchivedPawnIds,
+    getIncomingPawnIds,
     prepareSyncRows,
     type IncomingSyncRow,
 } from "@/lib/sync-pawn-records"
@@ -54,7 +55,8 @@ export async function runPawnRecordSync(params: {
         }
 
         const existingPawnIds = (existingRows ?? []).map((row) => String(row.pawn_id))
-        const activeIncomingPawnIds = prepared.validRows.map((row) => row.pawnId)
+        // Invalid rows are still present in the source and must not be archived.
+        const activeIncomingPawnIds = getIncomingPawnIds(params.payload.rows)
         const archivedPawnIds = buildArchivedPawnIds({
             existingPawnIds,
             activeIncomingPawnIds,

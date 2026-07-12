@@ -3,7 +3,7 @@ import {
     getPawnRecordById,
     getStaffPawnLookupById,
 } from "@/lib/pawn-records"
-import { SEARCHABLE_PAWN_RECORD_STATUS } from "@/lib/pawn-record-status"
+import { SEARCHABLE_PAWN_RECORD_STATUSES } from "@/lib/pawn-record-status"
 
 describe("getPawnRecordById", () => {
     it("normalizes numeric and optional timestamp fields from Supabase rows", async () => {
@@ -16,7 +16,7 @@ describe("getPawnRecordById", () => {
                 loan_amount: "10000.00",
                 promo_type: "โปร 1%",
                 base_rate: "0.01000",
-                source_status: SEARCHABLE_PAWN_RECORD_STATUS,
+                source_status: SEARCHABLE_PAWN_RECORD_STATUSES[0],
                 archived_from_source: false,
                 source_updated_at: "invalid-timestamp",
                 last_synced_at: "",
@@ -25,8 +25,8 @@ describe("getPawnRecordById", () => {
         })
 
         const eqArchived = vi.fn().mockReturnValue({ maybeSingle })
-        const eqStatus = vi.fn().mockReturnValue({ eq: eqArchived })
-        const eqPawnId = vi.fn().mockReturnValue({ eq: eqStatus })
+        const inStatuses = vi.fn().mockReturnValue({ eq: eqArchived })
+        const eqPawnId = vi.fn().mockReturnValue({ in: inStatuses })
         const select = vi.fn().mockReturnValue({ eq: eqPawnId })
         const from = vi.fn().mockReturnValue({ select })
 
@@ -52,9 +52,9 @@ describe("getPawnRecordById", () => {
             lastSyncedAt: null,
         })
         expect(eqPawnId).toHaveBeenCalledWith("pawn_id", "P-1001")
-        expect(eqStatus).toHaveBeenCalledWith(
+        expect(inStatuses).toHaveBeenCalledWith(
             "source_status",
-            SEARCHABLE_PAWN_RECORD_STATUS
+            SEARCHABLE_PAWN_RECORD_STATUSES
         )
         expect(eqArchived).toHaveBeenCalledWith("archived_from_source", false)
     })
@@ -65,8 +65,8 @@ describe("getPawnRecordById", () => {
             error: null,
         })
         const eqArchived = vi.fn().mockReturnValue({ maybeSingle })
-        const eqStatus = vi.fn().mockReturnValue({ eq: eqArchived })
-        const eqPawnId = vi.fn().mockReturnValue({ eq: eqStatus })
+        const inStatuses = vi.fn().mockReturnValue({ eq: eqArchived })
+        const eqPawnId = vi.fn().mockReturnValue({ in: inStatuses })
         const select = vi.fn().mockReturnValue({ eq: eqPawnId })
         const from = vi.fn().mockReturnValue({ select })
 
@@ -85,8 +85,11 @@ describe("getPawnRecordById", () => {
 
     it.each([
         ["ยังอยู่ในกำหนด", "active"],
+        ["ช่วงผ่อนผัน", "active"],
+        ["วันสุดท้าย", "active"],
         ["ไถ่แล้ว", "redeemed"],
         ["เอาขาด", "expired"],
+        ["ขาดแล้ว", "expired"],
         [null, "not_found"],
     ] as const)("classifies a staff lookup with status %s as %s", async (sourceStatus, expectedStatus) => {
         const maybeSingle = vi.fn().mockResolvedValue({

@@ -28,9 +28,10 @@ Important: `Base Percentage` is the source of truth for calculation. The sync
 script stores it as `baseRate`, so source values like `1%`, `1.5%`, `2%`,
 `0.01`, `0.015`, and `0.02` are calculated directly.
 
-Only rows whose `Status` is exactly `ยังอยู่ในกำหนด` are searchable in the app.
-Rows with `ไถ่แล้ว` or `เอาขาด` still sync into Supabase for traceability, but
-shared lookup paths treat them as not found.
+Records with `ยังอยู่ในกำหนด`, `ช่วงผ่อนผัน`, or `วันสุดท้าย` are searchable.
+
+Rows with `ไถ่แล้ว`, `เอาขาด`, or `ขาดแล้ว` still sync into Supabase for
+traceability, but shared lookup paths treat them as not found.
 
 ## Apps Script
 

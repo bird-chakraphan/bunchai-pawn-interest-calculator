@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
     buildArchivedPawnIds,
+    getIncomingPawnIds,
     prepareSyncRows,
     type IncomingSyncRow,
 } from "@/lib/sync-pawn-records"
@@ -117,6 +118,34 @@ describe("prepareSyncRows", () => {
             }),
         ])
     })
+
+    it("accepts every status used by the Loan Stock sheet", () => {
+        const records = [
+            { pawnId: "I06627", sourceStatus: "ช่วงผ่อนผัน" },
+            { pawnId: "I06613", sourceStatus: "ขาดแล้ว" },
+            { pawnId: "I06440", sourceStatus: "วันสุดท้าย" },
+            { pawnId: "P-1001", sourceStatus: "ยังอยู่ในกำหนด" },
+            { pawnId: "P-1002", sourceStatus: "ไถ่แล้ว" },
+            { pawnId: "P-1003", sourceStatus: "เอาขาด" },
+        ]
+
+        const result = prepareSyncRows(
+            records.map((record, index) => ({
+                rowIndex: index + 2,
+                pawnId: record.pawnId,
+                customerPhone: "0812345678",
+                startDate: "2024-06-10",
+                loanAmount: 10000,
+                promoType: "โปร 2%",
+                baseRate: 0.02,
+                sourceStatus: record.sourceStatus,
+                sourceUpdatedAt: null,
+            }))
+        )
+
+        expect(result.validRows).toHaveLength(records.length)
+        expect(result.issues).toEqual([])
+    })
 })
 
 describe("buildArchivedPawnIds", () => {
@@ -127,5 +156,28 @@ describe("buildArchivedPawnIds", () => {
                 activeIncomingPawnIds: ["P-1001", "P-1003"],
             })
         ).toEqual(["P-1002"])
+    })
+
+    it("keeps an invalid source row from being treated as deleted", () => {
+        const incomingPawnIds = getIncomingPawnIds([
+            {
+                rowIndex: 2,
+                pawnId: "P-1002",
+                customerPhone: null,
+                startDate: "2024-06-10",
+                loanAmount: 10000,
+                promoType: "โปร 2%",
+                baseRate: 0.02,
+                sourceStatus: "รอตรวจสอบ",
+                sourceUpdatedAt: null,
+            },
+        ])
+
+        expect(
+            buildArchivedPawnIds({
+                existingPawnIds: ["P-1001", "P-1002"],
+                activeIncomingPawnIds: incomingPawnIds,
+            })
+        ).toEqual(["P-1001"])
     })
 })

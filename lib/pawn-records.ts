@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import {
-    SEARCHABLE_PAWN_RECORD_STATUS,
+    isExpiredPawnRecordStatus,
+    isSearchablePawnRecordStatus,
+    SEARCHABLE_PAWN_RECORD_STATUSES,
     type PawnRecordSourceStatus,
 } from "@/lib/pawn-record-status"
 import type { PawnRecord } from "@/lib/staff-lookup"
@@ -84,7 +86,7 @@ export async function getPawnRecordById(params: {
             "id, pawn_id, customer_phone, start_date, loan_amount, promo_type, base_rate, archived_from_source, source_updated_at, last_synced_at"
         )
         .eq("pawn_id", params.pawnId)
-        .eq("source_status", SEARCHABLE_PAWN_RECORD_STATUS)
+        .in("source_status", SEARCHABLE_PAWN_RECORD_STATUSES)
         .eq("archived_from_source", false)
         .maybeSingle<PawnRecordRow>()
 
@@ -120,7 +122,7 @@ export async function getStaffPawnLookupById(params: {
         return { status: "not_found" }
     }
 
-    if (data.source_status === SEARCHABLE_PAWN_RECORD_STATUS) {
+    if (isSearchablePawnRecordStatus(data.source_status)) {
         return { status: "active", record: mapPawnRecordRow(data) }
     }
 
@@ -128,7 +130,7 @@ export async function getStaffPawnLookupById(params: {
         return { status: "redeemed" }
     }
 
-    if (data.source_status === "เอาขาด") {
+    if (isExpiredPawnRecordStatus(data.source_status)) {
         return { status: "expired" }
     }
 
