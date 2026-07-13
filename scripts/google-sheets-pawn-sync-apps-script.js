@@ -8,6 +8,7 @@
  * 4. Set Script Properties:
  *    - APP_SYNC_ENDPOINT=https://your-domain.com/api/internal/sync/pawn-records
  *    - INTERNAL_SYNC_SECRET=<same value as the app env>
+ *    - LOAN_AMOUNT_COLUMN_LETTER=<optional override; default is BJ / Updated Loan Amount>
  *    - PROMO_COLUMN_LETTER=<optional override; default is AL / Base Percentage>
  *    - DEFAULT_PROMO_TYPE=<optional fallback; use only if Base Percentage is blank>
  * 5. Run installDualFrequencyTriggers once.
@@ -21,7 +22,7 @@ const CONFIG = {
     LOAN_STOCK_SHEET_NAME: "Loan Stock",
     CUSTOMER_SHEET_NAME: "Customer",
     LOAN_ID_COLUMN: "A",
-    LOAN_AMOUNT_COLUMN: "AK",
+    LOAN_AMOUNT_COLUMN: "BJ",
     CUSTOMER_ID_COLUMN_IN_LOAN_STOCK: "AM",
     PROMO_COLUMN: "AL",
     LATEST_RENEWAL_DATE_COLUMN: "AP",
@@ -69,6 +70,8 @@ function syncPawnRecords(event) {
     const properties = PropertiesService.getScriptProperties()
     const endpoint = requireScriptProperty_(properties, "APP_SYNC_ENDPOINT")
     const syncSecret = requireScriptProperty_(properties, "INTERNAL_SYNC_SECRET")
+    const loanAmountColumnLetter =
+        properties.getProperty("LOAN_AMOUNT_COLUMN_LETTER") || CONFIG.LOAN_AMOUNT_COLUMN
     const promoColumnLetter =
         properties.getProperty("PROMO_COLUMN_LETTER") || CONFIG.PROMO_COLUMN
     const defaultPromoType = properties.getProperty("DEFAULT_PROMO_TYPE")
@@ -87,6 +90,7 @@ function syncPawnRecords(event) {
 
     const customerPhoneById = buildCustomerPhoneById_(customerSheet)
     const rows = buildPawnRows_(loanSheet, customerPhoneById, {
+        loanAmountColumnLetter,
         promoColumnLetter,
         defaultPromoType,
     })
@@ -176,7 +180,9 @@ function buildPawnRows_(sheet, customerPhoneById, options) {
     }
 
     const loanIdColumn = columnToIndex_(CONFIG.LOAN_ID_COLUMN)
-    const amountColumn = columnToIndex_(CONFIG.LOAN_AMOUNT_COLUMN)
+    const amountColumn = columnToIndex_(
+        options.loanAmountColumnLetter || CONFIG.LOAN_AMOUNT_COLUMN
+    )
     const customerIdColumn = columnToIndex_(CONFIG.CUSTOMER_ID_COLUMN_IN_LOAN_STOCK)
     const renewalDateColumn = columnToIndex_(CONFIG.LATEST_RENEWAL_DATE_COLUMN)
     const statusColumn = columnToIndex_(CONFIG.STATUS_COLUMN)

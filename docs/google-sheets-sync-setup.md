@@ -16,7 +16,7 @@ Loan tab:
 | App field | Sheet source |
 | --- | --- |
 | `pawnId` | `Loan Stock!A` / `Loan ID` |
-| `loanAmount` | `Loan Stock!AK` / `Total Loan Amount` |
+| `loanAmount` | `Loan Stock!BJ` / `Updated Loan Amount` |
 | `startDate` | `Loan Stock!AP` / `Latest Renewal Date` |
 | customer join key | `Loan Stock!AM` / `Customer Name`, which is actually Customer ID |
 | `customerPhone` | join `Loan Stock!AM` to `Customer!A`, then use `Customer!F` / `Phone Number` |
@@ -47,6 +47,7 @@ Setup steps:
 5. Add:
    - `APP_SYNC_ENDPOINT`: `https://your-domain.com/api/internal/sync/pawn-records`
    - `INTERNAL_SYNC_SECRET`: same value as the app environment variable
+   - `LOAN_AMOUNT_COLUMN_LETTER`: optional override; default is `BJ`
    - `PROMO_COLUMN_LETTER`: optional override; default is `AL`
    - `DEFAULT_PROMO_TYPE`: optional fallback, only if `Base Percentage` is blank
 6. Run `installDualFrequencyTriggers` once.
