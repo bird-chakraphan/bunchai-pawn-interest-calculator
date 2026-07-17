@@ -1,43 +1,11 @@
-import { redirect } from "next/navigation"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { requireActiveStaffContext } from "@/lib/staff-access"
 
 export const dynamic = "force-dynamic"
 
 export default async function StaffProtectedLayout(props: {
     children: React.ReactNode
 }) {
-    const supabase = await createServerSupabaseClient()
-
-    if (!supabase) {
-        return (
-            <main className="phase-page">
-                <section className="pawn-calculator-app">
-                    <header className="pawn-header">
-                        <h1>Staff Area Setup</h1>
-                    </header>
-
-                    <div className="pawn-card staff-auth-card">
-                        <div className="staff-auth-message is-warning">
-                            ยังไม่ได้ตั้งค่า Supabase กรุณาเพิ่มค่าใน <code>.env</code> ก่อนเปิดใช้งาน Staff Area
-                        </div>
-                    </div>
-                </section>
-            </main>
-        )
-    }
-
-    let user = null
-
-    try {
-        const result = await supabase.auth.getUser()
-        user = result.data.user
-    } catch {
-        redirect("/staff/sign-in")
-    }
-
-    if (!user) {
-        redirect("/staff/sign-in")
-    }
+    await requireActiveStaffContext()
 
     return props.children
 }

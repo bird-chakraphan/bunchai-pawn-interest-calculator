@@ -6,7 +6,8 @@ import {
     getPaymentStatusLabel,
     getRenewalStatusLabel,
 } from "@/lib/payment-presentation"
-import { createAdminSupabaseClient } from "@/lib/supabase/admin"
+import { requireServiceAccess } from "@/lib/staff-access"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
@@ -26,7 +27,8 @@ interface ReviewQueueRow {
 }
 
 export default async function StaffPaymentsPage() {
-    const supabase = createAdminSupabaseClient()
+    await requireServiceAccess("pawn")
+    const supabase = await createServerSupabaseClient()
 
     if (!supabase) {
         return <PaymentSetupState />
@@ -98,7 +100,7 @@ function PaymentSetupState() {
                 </header>
                 <div className="pawn-card staff-auth-card">
                     <div className="staff-auth-message is-warning">
-                        ยังไม่ได้ตั้งค่า Supabase service role สำหรับหน้ารายการชำระเงิน
+                        ยังไม่ได้ตั้งค่า Supabase สำหรับหน้ารายการชำระเงิน
                     </div>
                 </div>
             </section>
@@ -128,7 +130,7 @@ function ReviewTaskSection(props: {
                         return (
                             <Link
                                 className="staff-payment-row"
-                                href={`/staff/payments/${payment.id}`}
+                                href={`/staff/pawn/payments/${payment.id}`}
                                 key={task.id}
                             >
                                 <div>

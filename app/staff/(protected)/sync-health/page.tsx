@@ -2,13 +2,15 @@ import Link from "next/link"
 import { signOutAction } from "@/app/staff/sign-in/actions"
 import { StaffTitleMenu } from "@/components/staff-title-menu"
 import { formatThaiDateTime } from "@/lib/payment-presentation"
-import { createAdminSupabaseClient } from "@/lib/supabase/admin"
+import { requireServiceAccess } from "@/lib/staff-access"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 import { getSyncHealthSnapshot, type SyncHealthSnapshot } from "@/lib/sync-health"
 
 export const dynamic = "force-dynamic"
 
 export default async function StaffSyncHealthPage() {
-    const supabase = createAdminSupabaseClient()
+    await requireServiceAccess("pawn")
+    const supabase = await createServerSupabaseClient()
 
     if (!supabase) {
         return (
@@ -22,7 +24,7 @@ export default async function StaffSyncHealthPage() {
 
                     <div className="pawn-card staff-auth-card">
                         <div className="staff-auth-message is-warning">
-                            ยังไม่ได้ตั้งค่า Supabase service role สำหรับหน้า sync health
+                            ยังไม่ได้ตั้งค่า Supabase สำหรับหน้า sync health
                         </div>
                     </div>
                 </section>
@@ -54,7 +56,7 @@ export default async function StaffSyncHealthPage() {
                         <Link
                             aria-label="กลับไปหน้าพนักงาน"
                             className="staff-sync-health-back-link"
-                            href="/staff"
+                            href="/staff/pawn"
                             title="กลับไปหน้าพนักงาน"
                         >
                             <svg

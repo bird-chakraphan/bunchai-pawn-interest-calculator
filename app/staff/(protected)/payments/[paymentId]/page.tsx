@@ -9,7 +9,8 @@ import {
     getPaymentStatusLabel,
     getRenewalStatusLabel,
 } from "@/lib/payment-presentation"
-import { createAdminSupabaseClient } from "@/lib/supabase/admin"
+import { requireServiceAccess } from "@/lib/staff-access"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 export const dynamic = "force-dynamic"
 
@@ -54,7 +55,8 @@ export default async function StaffPaymentDetailPage(props: {
         props.params,
         props.searchParams,
     ])
-    const supabase = createAdminSupabaseClient()
+    await requireServiceAccess("pawn")
+    const supabase = await createServerSupabaseClient()
 
     if (!supabase) {
         return <PaymentDetailSetupState />
@@ -108,7 +110,7 @@ export default async function StaffPaymentDetailPage(props: {
                 <header className="pawn-header pawn-header-with-actions">
                     <div className="pawn-title-row">
                         <h1>ตรวจสอบการชำระ {payment.pawn_id_snapshot}</h1>
-                        <Link className="staff-inline-action" href="/staff/payments">
+                        <Link className="staff-inline-action" href="/staff/pawn/payments">
                             กลับไปรายการชำระเงิน
                         </Link>
                     </div>
@@ -219,7 +221,7 @@ function PaymentDetailSetupState() {
                 </header>
                 <div className="pawn-card staff-auth-card">
                     <div className="staff-auth-message is-warning">
-                        ยังไม่ได้ตั้งค่า Supabase service role สำหรับหน้าตรวจสอบการชำระเงิน
+                        ยังไม่ได้ตั้งค่า Supabase สำหรับหน้าตรวจสอบการชำระเงิน
                     </div>
                 </div>
             </section>

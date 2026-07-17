@@ -4,23 +4,15 @@ import { redirect } from "next/navigation"
 import { recordAuditEvent } from "@/lib/audit-events"
 import { getPaymentReviewDecision } from "@/lib/payment-review"
 import { createAdminSupabaseClient } from "@/lib/supabase/admin"
-import { createServerSupabaseClient } from "@/lib/supabase/server"
+import { requireServiceAccess } from "@/lib/staff-access"
 
 export async function markPaymentReviewCompleteAction(formData: FormData) {
     const paymentId = String(formData.get("paymentId") ?? "").trim()
-    const authSupabase = await createServerSupabaseClient()
     const adminSupabase = createAdminSupabaseClient()
+    const staff = await requireServiceAccess("pawn")
 
-    if (!paymentId || !authSupabase || !adminSupabase) {
+    if (!paymentId || !adminSupabase) {
         redirect(`/staff/payments/${paymentId}?error=setup`)
-    }
-
-    const {
-        data: { user },
-    } = await authSupabase.auth.getUser()
-
-    if (!user) {
-        redirect("/staff/sign-in")
     }
 
     const [paymentResult, taskResult] = await Promise.all([
@@ -62,7 +54,7 @@ export async function markPaymentReviewCompleteAction(formData: FormData) {
         .update({
             status: "completed",
             reviewed_at: reviewedAt,
-            reviewed_by: user.id,
+            reviewed_by: staff.userId,
         })
         .eq("payment_id", paymentId)
         .eq("status", "pending")
@@ -84,7 +76,7 @@ export async function markPaymentReviewCompleteAction(formData: FormData) {
 
     await recordAuditEvent({
         supabase: adminSupabase,
-        actorUserId: user.id,
+        actorUserId: staff.userId,
         eventType: "payment_review_completed",
         entityType: "payment",
         entityId: paymentId,

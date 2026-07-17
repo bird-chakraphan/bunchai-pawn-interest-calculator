@@ -13,6 +13,10 @@ function readError(searchParams: { [key: string]: string | string[] | undefined 
         return "ยังไม่ได้ตั้งค่า Supabase ในเครื่องนี้"
     }
 
+    if (errorValue === "staff-access-required") {
+        return "บัญชีนี้ยังไม่ได้รับสิทธิ์ใช้งานระบบพนักงาน"
+    }
+
     return errorValue
 }
 

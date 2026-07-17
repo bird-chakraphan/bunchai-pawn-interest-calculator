@@ -68,7 +68,7 @@ export function StaffTitleMenu(props: StaffTitleMenuProps) {
                 <div className="pawn-card staff-menu-list" role="menu">
                     <Link
                         className="staff-menu-item"
-                        href="/staff/sync-health"
+                        href="/staff/pawn/sync-health"
                         role="menuitem"
                         onClick={() => setIsOpen(false)}
                     >
@@ -76,7 +76,7 @@ export function StaffTitleMenu(props: StaffTitleMenuProps) {
                     </Link>
                     <Link
                         className="staff-menu-item"
-                        href="/staff/payments"
+                        href="/staff/pawn/payments"
                         role="menuitem"
                         onClick={() => setIsOpen(false)}
                     >
