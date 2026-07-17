@@ -124,6 +124,7 @@ declare
     target_policy record;
 begin
     foreach target_table in array array[
+        'staff_profiles',
         'pawn_records',
         'sync_runs',
         'sync_run_issues',
