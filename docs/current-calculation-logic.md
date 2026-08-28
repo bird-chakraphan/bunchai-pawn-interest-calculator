@@ -1,6 +1,6 @@
 # Current Calculation Logic
 
-Last summarized: 2026-06-18
+Last summarized: 2026-08-28
 
 This document logs the calculation behavior currently implemented in the Framer
 `PawnInterestCalculator` component and mirrored by the spreadsheet review script.
@@ -105,6 +105,7 @@ Mode: `weeklyOnePercent`
 Used only for `ไถ่ของ` when:
 
 - `overdueFromLatestBoundary` is 1 to 7 days, inclusive.
+- the 3-month contract has not yet expired.
 
 Formula:
 
@@ -125,13 +126,14 @@ There is no 2-week or 3-week mode in the current logic. If the redeem date is
 more than 7 days after the latest boundary, the calculation returns to full
 monthly promotion rounding.
 
-### Extend Penalty 3 Percent
+### Penalty 3 Percent
 
 Mode: `penaltyThreePercent`
 
-Used only for `ต่อดอก` when:
+Used for either action when:
 
-- `overdueFromContractExpiry` is more than 20 days.
+- `ไถ่ของ`: from 1 through 20 days after the 3-month contract expiry.
+- `ต่อดอก`: more than 20 days after the 3-month contract expiry.
 
 Formula:
 
@@ -144,6 +146,10 @@ Method text:
 ```text
 เกินกำหนด ใช้อัตรา 3%
 ```
+
+For redemption in the 20-day post-expiry window, the charged month count is the
+fourth started month. For example, a 25,000 baht loan redeemed four days after
+the 3-month expiry is `25,000 × 3% × 4 เดือน = 3,000 บาท` interest.
 
 ### Redeem Blocked
 
@@ -211,11 +217,15 @@ These examples should become automated tests in the new app:
    1 month plus 5 days, use promotion for 1 completed month plus weekly 1%.
 5. Start 10 Apr 2026, current 18 May 2026, `โปรแสน (1.5%)`, `ไถ่ของ`: 8 days
    after latest boundary, use full monthly promotion rounding instead of weekly.
-6. Start 10 Jan 2026, current 1 May 2026, `โปร 2%`, `ต่อดอก`: 21 days after
+6. Start 10 Jan 2026, current 11 Apr 2026, `โปร 2%`, `ไถ่ของ`: 1 day after
+   contract expiry, use 3% for 4 months.
+7. Start 10 Jan 2026, current 30 Apr 2026, `โปร 2%`, `ไถ่ของ`: 20 days after
+   contract expiry, use 3% for 4 months.
+8. Start 10 Jan 2026, current 1 May 2026, `โปร 2%`, `ต่อดอก`: 21 days after
    contract expiry, use 3% penalty rate.
-7. Start 10 Jan 2026, current 1 May 2026, `โปร 2%`, `ไถ่ของ`: 21 days after
+9. Start 10 Jan 2026, current 1 May 2026, `โปร 2%`, `ไถ่ของ`: 21 days after
    contract expiry, redeem is blocked.
-8. Start 27 Apr 2026, current 11 May 2026, `โปรแสน (1.5%)`, `ไถ่ของ`: current
+10. Start 27 Apr 2026, current 11 May 2026, `โปรแสน (1.5%)`, `ไถ่ของ`: current
    example from the workbook.
 
 ## Preservation Rules For The Rebuild
@@ -224,9 +234,10 @@ These examples should become automated tests in the new app:
 - Preserve end-of-month fallback.
 - Preserve `ceil` rounding.
 - Preserve separate `actualMonthCount` and `monthCount`.
-- Preserve the special 1-7 day redeem weekly rule.
+- Preserve the special 1-7 day redeem weekly rule before contract expiry.
 - Preserve the 20-day post-contract grace rule.
 - Preserve blocked redeem after more than 20 days past contract expiry.
-- Preserve 3% penalty for extend after more than 20 days past contract expiry.
+- Preserve 3% penalty for redeem during the 20-day post-contract window and
+  for extend after more than 20 days past contract expiry.
 - Keep database/payment additions outside the pure calculation engine so the
   calculation remains easy to test.

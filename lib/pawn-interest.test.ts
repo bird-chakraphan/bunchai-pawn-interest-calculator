@@ -174,6 +174,44 @@ describe("calculatePawnInterest", () => {
         expect(result.formulaText).toBe("10,000 × 3% × 4 เดือน")
     })
 
+    it.each([
+        ["2026-04-11", 1],
+        ["2026-04-30", 20],
+    ])(
+        "uses 3 percent for redeem %i day(s) after contract expiry",
+        (currentDate, overdueFromContractExpiry) => {
+            const result = calculatePawnInterest({
+                startDate: "2026-01-10",
+                currentDate,
+                loanAmount: 10000,
+                promoType: "โปร 2%",
+                transactionType: "ไถ่ของ",
+            })
+
+            expect(result.mode).toBe("penaltyThreePercent")
+            expect(result.rateLabel).toBe("3% ต่อเดือน")
+            expect(result.monthCount).toBe(4)
+            expect(result.overdueFromContractExpiry).toBe(overdueFromContractExpiry)
+            expect(result.interestAmount).toBe(1200)
+            expect(result.formulaText).toBe("10,000 × 3% × 4 เดือน")
+        }
+    )
+
+    it("uses 3 percent for the reported redemption calculation after three months", () => {
+        const result = calculatePawnInterest({
+            startDate: "2026-05-24",
+            currentDate: "2026-08-28",
+            loanAmount: 25000,
+            promoType: "โปร 2%",
+            transactionType: "ไถ่ของ",
+        })
+
+        expect(result.mode).toBe("penaltyThreePercent")
+        expect(result.monthCount).toBe(4)
+        expect(result.interestAmount).toBe(3000)
+        expect(result.formulaText).toBe("25,000 × 3% × 4 เดือน")
+    })
+
     it("blocks redeem after 20 days past contract expiry", () => {
         const result = calculatePawnInterest({
             startDate: "2026-01-10",

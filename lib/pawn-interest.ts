@@ -204,6 +204,19 @@ function determineInterestMode(params: {
 
     if (
         params.transactionType === "ไถ่ของ" &&
+        params.overdueFromContractExpiry > 0
+    ) {
+        return {
+            mode: "penaltyThreePercent" as const,
+            rate: 0.03,
+            rateLabel: "3% ต่อเดือน",
+            method: "เกินกำหนด ใช้อัตรา 3%",
+            status: getContractStatus(params.overdueFromContractExpiry),
+        }
+    }
+
+    if (
+        params.transactionType === "ไถ่ของ" &&
         params.overdueFromLatestBoundary > 0 &&
         params.overdueFromLatestBoundary <= 7
     ) {
