@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "codex/b01-isolated-environment": false,
+      "codex/bunchai-*": false
+    }
+  }
+}
