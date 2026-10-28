@@ -1,6 +1,6 @@
 # B01 Git and deployment review path
 
-28 October 2026. The owner-approved engineering setup is applied and batch issue #13 is open. The guarded integration branch now exists; B01 feature publication is blocked by automatic approval review pending explicit approval of the exact upload; the draft PR has not been created.
+28 October 2026. The owner-approved engineering setup is applied and batch issue #13 is open. The guarded integration branch now exists; the owner explicitly approved the reviewed upload and [draft PR #14](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/pull/14) is open against codex/bunchai-integration, unmerged.
 
 ## Verified baseline
 
@@ -34,14 +34,18 @@ Source: [Vercel Git configuration](https://vercel.com/docs/project-configuration
 
 AGENTS.md and docs/agents/ are applied after owner approval. [Issue #13](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/issues/13) is the open parent. Standard role mappings are configured; the three missing role labels are not needed for this in-progress parent and have not been created. The existing enhancement label is used. Full shop business rules are not published; the portable B01 scope/source map and glossary extract define this review boundary.
 
-The GitHub connector publishes reviewed content with the connected account identity. Earlier local commits are retained locally and are not uploaded, avoiding publication of their automatically derived machine email. The remote B01 commit will be based on the guarded integration commit; compare tree contents rather than assuming local and remote commit IDs are identical.
+The GitHub connector publishes reviewed content with the connected account identity. Earlier local commits are retained locally and are not uploaded, avoiding publication of their automatically derived machine email. The remote B01 snapshot commit is based on the guarded integration commit; compare tree contents rather than assuming local and remote commit IDs are identical.
 
 ## Remote verification and publication boundary
 
-After creating the integration branch, Vercel still listed only the four existing deployments; the live deployment remains dpl_96XQWXErbKZddZutFP2puFufyYyC from main at bc041a1cd2b864ca9afe261a0bcc7f290dd91b07. Live public/staff entry points returned 200 and 307 to /staff/sign-in. There is no B01 feature branch or draft PR yet and no remote CI result is claimed.
+After creating the integration branch, Vercel still listed only the four existing deployments; the live deployment remains dpl_96XQWXErbKZddZutFP2puFufyYyC from main at bc041a1cd2b864ca9afe261a0bcc7f290dd91b07. Live public/staff entry points returned 200 and 307 to /staff/sign-in. After owner approval, the B01 feature branch and draft PR #14 were created. Initial snapshot commit is 479f8423ccd37d0dd57071031536c54cc0ed569d, tree 3ad060ac9f2b5caa1033f6e5c19e1e68c6e8d7bd, exactly matching the reviewed local tree. Vercel still listed only four old deployments after publication. The first GitHub check read returned zero check runs and zero statuses; the combined API state pending with an empty list is not a running or passed CI job. The PR was draft/open/unmerged and conflict-free when checked.
 
-Automatic approval review rejected the create-tree operation for the 26-file B01 bundle because publishing application code, infrastructure scripts, local schema, operational metadata and test configuration to this public repository requires explicit payload-and-destination approval. No alternate upload path was attempted. The local publication-review manifest and patch are saved in the parent workspace. Continue only after approval of that reviewed payload; keep main unchanged and open the PR against codex/bunchai-integration.
+Automatic approval review rejected the create-tree operation for the 26-file B01 bundle because publishing application code, infrastructure scripts, local schema, operational metadata and test configuration to this public repository requires explicit payload-and-destination approval. No alternate upload path was attempted. The local publication-review manifest and patch are saved in the parent workspace. The owner subsequently explicitly approved this exact publication; the initial snapshot was uploaded through the connector. Main remains unchanged and the PR targets codex/bunchai-integration. The original denial is retained as history, not an outstanding approval request.
 
 ## Owner-approved Projects and naming
 
 Bunchai Shop System (https://github.com/users/bird-chakraphan/projects/1) contains #13 in In Progress. Pawn Calculator (https://github.com/users/bird-chakraphan/projects/2) contains all calculator issues #1–#12: eight closed/completed in Done, and four open backlog items #9–#12 in Backlog. Both boards remain private and are linked to this repository. Titles use [SHOP B01] for the current shop batch and [CALC] for existing calculator issues. Future dedicated shared database issues use [SHARED DB] and can belong to both boards. Area labels are not used. Existing descriptions, state/reason and label sets were verified unchanged. This approved issue organization does not approve the separate public code payload.
+
+## Publication checkpoint
+
+The first 26-file snapshot is commit 479f8423ccd37d0dd57071031536c54cc0ed569d. Subsequent changes only update these progress records to reflect publication; application/configuration/test contents are unchanged from the verified owner-approved snapshot. Earlier local history is preserved under codex/b01-local-checkpoints; the working B01 branch is aligned with the connector-created remote history after verifying identical trees. No merge or hosted deployment is authorized by publishing this draft PR.
