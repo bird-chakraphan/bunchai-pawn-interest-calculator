@@ -17,7 +17,12 @@ export const metadata: Metadata = {
 export default function RootLayout(props: Readonly<{ children: React.ReactNode }>) {
     return (
         <html lang="th" className={notoSansThai.variable}>
-            <body>{props.children}</body>
+            <body>
+                <div role="status" style={{ padding: "8px 16px", textAlign: "center", background: "#fff3cd", color: "#513c00" }}>
+                    ข้อมูลตัวอย่างสำหรับทดสอบ — ไม่ใช่รายการจริงของร้าน
+                </div>
+                {props.children}
+            </body>
         </html>
     )
 }
