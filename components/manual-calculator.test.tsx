@@ -190,7 +190,7 @@ describe("ManualCalculator", () => {
             customerPhone: "0000000000",
             archivedFromSource: false,
             sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
-            lastSyncedAt: "2024-07-10T10:00:00.000Z",
+            lastSyncedAt: new Date(2024, 6, 10, 17, 0).toISOString(),
         }
         render(
             <ManualCalculator
@@ -235,7 +235,7 @@ describe("ManualCalculator", () => {
             customerPhone: "0000000000",
             archivedFromSource: true,
             sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
-            lastSyncedAt: "2024-07-10T10:00:00.000Z",
+            lastSyncedAt: new Date(2024, 6, 10, 17, 0).toISOString(),
         }
         render(
             <ManualCalculator

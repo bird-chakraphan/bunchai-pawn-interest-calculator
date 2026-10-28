@@ -28,7 +28,14 @@ jobs:
           node-version: '24.22.1'
           package-manager-cache: false
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: npm test
+      - name: Test in UTC
+        run: npm test
+        env:
+          TZ: UTC
+      - name: Test in Bangkok
+        run: npm test
+        env:
+          TZ: Asia/Bangkok
       - run: npm run typecheck
       - name: Compile the local-test application
         run: npm run build
