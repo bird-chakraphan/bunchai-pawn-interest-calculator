@@ -2,6 +2,13 @@
 
 28 October 2026. The owner-approved engineering setup is applied and batch issue #13 is open. The guarded integration branch now exists; the owner explicitly approved the reviewed upload and [draft PR #14](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/pull/14) is open against codex/bunchai-integration, unmerged.
 
+
+## Latest checkpoint — 29 October
+
+The owner authorized an unattended B01-only queue after initial publication. Current verified source checkpoint is `71c436a595d1481e394bc6e8ed62a99d22ca6939`, tree `859815b7385bd08e1d6c9304931efc316fd5bd00`. [CI run 40746556833](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/actions/runs/40746556833) passed 94 tests in each of UTC/Bangkok, TypeScript and build. A duplicate push run was cancelled by expected concurrency. The stale UI-test assertions were repaired against actual behavior; no calculator component or engine changed. Local startup/Auth/recovery hardening and post-recovery browser checks are detailed in [the overnight report](b01-overnight-2026-10-29.md).
+
+PR #14 remains open, draft, unmerged and conflict-free against `codex/bunchai-integration`. Main and the live deployment remain at bc041a1; no new legacy deployment was listed. The historical zero-check result and two failing tests below describe the initial checkpoint, not current results. The setup, portable packet, parent issue and draft PR steps below are completed; hosted test resources, relevant physical checks, owner acceptance and integration are pending. No branch-protection requirement is claimed from the presence of a successful workflow; integration remains a manual review gate.
+
 ## Verified baseline
 
 - Existing remote branches: `main` at `bc041a1cd2b864ca9afe261a0bcc7f290dd91b07` and `codex/jewelry-staff-foundation` at `a0799af0e936a7cf87dc3ceb575a03b3ea09fe23`, both unprotected.
@@ -48,4 +55,4 @@ Bunchai Shop System (https://github.com/users/bird-chakraphan/projects/1) contai
 
 ## Publication checkpoint
 
-The first 26-file snapshot is commit 479f8423ccd37d0dd57071031536c54cc0ed569d. Subsequent changes only update these progress records to reflect publication; application/configuration/test contents are unchanged from the verified owner-approved snapshot. Earlier local history is preserved under codex/b01-local-checkpoints; the working B01 branch is aligned with the connector-created remote history after verifying identical trees. No merge or hosted deployment is authorized by publishing this draft PR.
+The first 26-file snapshot is commit 479f8423ccd37d0dd57071031536c54cc0ed569d. Its immediate follow-up 521fe94 was documentation only. The later owner-authorized B01-only queue added stale-test repairs, CI, an application-URL isolation guard and local setup/Auth/recovery hardening; see the latest checkpoint above. Earlier local history is preserved under codex/b01-local-checkpoints; the working B01 branch is aligned with the connector-created remote history after verifying identical trees. No merge or hosted deployment is authorized by publishing this draft PR.
