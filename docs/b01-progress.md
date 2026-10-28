@@ -6,7 +6,11 @@ This is the existing `bird-chakraphan/bunchai-pawn-interest-calculator` reposito
 
 ## Current local result
 
-The local sample-data application is available at `http://127.0.0.1:3000`. See [the startup/recovery runbook](b01-local-runbook.md) and [check summary](b01-local-checks-2026-10-28.json). Browser lookup, trace write/read, private-file hash recovery and anonymous-table rejection passed before/after local reset/restore. Build/TypeScript pass; 81/83 tests pass, retaining the same two baseline UI failures. The owner confirmed the local trial works and approved AGENTS.md plus the reviewed engineering setup. Node 24.22.1 additionally passes build/TypeScript, the same 81/83 tests, local sample lookup and restored trace/file/anonymous-access checks. GitHub feature publication and the draft PR are now complete. Hosted test deployment and final owner acceptance remain pending.
+The local sample-data application is available at `http://127.0.0.1:3000`. The owner authorized an unattended **B01-only** queue on 29 October. See [the current overnight report](b01-overnight-2026-10-29.md) and [startup/recovery runbook](b01-local-runbook.md). All 94 tests pass in UTC and Bangkok; TypeScript passes. The two baseline failures were stale tests following a deliberate historical UI simplification; tests now cover actual locked fields, renewal/redemption selection and expiry warnings using the real view model. No calculator component or engine changed.
+
+Development-only GitHub CI now checks tests in both timezones, TypeScript and a build with nonfunctional local placeholders; run 40743216730 passed at revision 6dceeb43ec5c6e35bcd6406daf0fb2abb03d1f8a. Local startup/health/recovery commands verify exact unlinked targets/current local keys, withhold command output containing keys and refuse remote Docker/unsafe configuration. The local email-provider setup was repaired while keeping public registration disabled. Synthetic sign-in/out, authenticated sample read, wrong-password rejection and signed-out denial passed. A full local public-data/private-probe recovery command passed after adding service-readiness checks; Auth history/full-media recovery is not claimed.
+
+Browser staff/customer lookup passed after recovery at desktop/tablet-sized widths. Physical device checks, eligible hosted test resources/site, final owner acceptance and development integration remain pending. PR #14 stays draft and targets development integration; no production release is authorized.
 
 ## Portable review packet
 

@@ -1,16 +1,11 @@
-import nextEnv from "@next/env"
 import { createClient } from "@supabase/supabase-js"
 import { createHash, randomUUID } from "node:crypto"
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { loadLocalContext } from "./b01-local-target.mjs"
 
-nextEnv.loadEnvConfig(process.cwd())
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-if (url !== "http://127.0.0.1:55321" || process.env.NEXT_PUBLIC_BUNCHAI_ENVIRONMENT !== "local-test"
-    || existsSync("supabase/.temp/project-ref")) {
-    throw new Error("B01 data checks are restricted to the unlinked local test stack")
-}
-const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } })
-const anon = createClient(url, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY, { auth: { persistSession: false } })
+const { url, serviceKey, anonKey } = loadLocalContext()
+const admin = createClient(url, serviceKey, { auth: { persistSession: false } })
+const anon = createClient(url, anonKey, { auth: { persistSession: false } })
 const folder = "supabase/.temp/b01-recovery"
 const bucket = "b01-test-files"
 mkdirSync(folder, { recursive: true })

@@ -8,6 +8,11 @@
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit --incremental false",
+    "b01:up": "node scripts/b01-local-up.mjs",
+    "b01:dev": "node scripts/b01-local-up.mjs --dev",
+    "b01:check": "node scripts/b01-local-check.mjs",
+    "b01:auth": "node scripts/b01-auth-fixture.mjs check",
+    "b01:recovery": "node scripts/b01-recover-local.mjs --reset-local",
     "test:watch": "vitest"
   },
   "dependencies": {

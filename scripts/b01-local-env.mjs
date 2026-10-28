@@ -1,23 +1,8 @@
-import { execFileSync } from "node:child_process"
-import { existsSync, readFileSync, writeFileSync } from "node:fs"
+import { existsSync, writeFileSync } from "node:fs"
+import { getLocalStatus } from "./b01-local-target.mjs"
 
 // Capture locally generated keys without printing them or reading a hosted key.
-if (!readFileSync("supabase/config.toml", "utf8").includes('project_id = "bunchai-b01-local"')) {
-    throw new Error("Run this script from the B01 application checkout")
-}
-if (existsSync("supabase/.temp/project-ref")) {
-    throw new Error("B01 must not be linked to any hosted Supabase project")
-}
-const status = JSON.parse(execFileSync("supabase", ["status", "-o", "json"], {
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-}))
-if (status.API_URL !== "http://127.0.0.1:55321") {
-    throw new Error("Unexpected local API URL; no environment file written")
-}
-if (!status.ANON_KEY || !status.SERVICE_ROLE_KEY) {
-    throw new Error("Local stack did not provide required keys")
-}
+const status = getLocalStatus()
 const env = {
     NEXT_PUBLIC_BUNCHAI_ENVIRONMENT: "local-test",
     NEXT_PUBLIC_SUPABASE_URL: status.API_URL,
