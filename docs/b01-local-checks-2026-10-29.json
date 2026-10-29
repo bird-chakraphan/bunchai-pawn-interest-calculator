@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-29",
+  "timezone": "Asia/Bangkok",
+  "scope": "B01 local synthetic compatibility trial only; incomplete batch",
+  "runtime": "Node 24.22.1",
+  "tests": {
+    "utc": {
+      "total": 94,
+      "passed": 94,
+      "failed": 0
+    },
+    "bangkok": {
+      "total": 94,
+      "passed": 94,
+      "failed": 0
+    }
+  },
+  "typecheck": "passed",
+  "localBuild": "passed",
+  "localTarget": {
+    "project": "bunchai-b01-local",
+    "network": "bunchai-b01-loopback",
+    "app": "http://127.0.0.1:3000",
+    "api": "http://127.0.0.1:55321",
+    "hostedLink": false,
+    "healthyServices": 8,
+    "publishedPorts": "127.0.0.1 only",
+    "currentLocalKeysMatch": true
+  },
+  "auth": {
+    "syntheticFixtureOnly": true,
+    "wrongPasswordDenied": true,
+    "signIn": true,
+    "authenticatedSampleLookup": true,
+    "publicRegistrationDisabled": true,
+    "signOut": true,
+    "signedOutTableDenied": true
+  },
+  "recovery": {
+    "publicRowsRestored": true,
+    "privateProbeFileHashMatches": true,
+    "pawnCount": 1,
+    "anonymousTableDenied": true,
+    "syntheticAuthRecreated": true,
+    "priorBackupFilesArchivedLocally": true,
+    "fullAuthHistoryOrMediaBackup": false,
+    "productionRestoreProof": false,
+    "firstAttempt": "File step failed after public rows restored; file-only retry passed. Added all-service readiness wait; second complete rehearsal passed."
+  },
+  "browser": {
+    "engine": "Chrome",
+    "desktop": {
+      "width": 1440,
+      "height": 900
+    },
+    "tabletViewport": {
+      "width": 820,
+      "height": 1180,
+      "horizontalOverflow": false
+    },
+    "postRecovery": [
+      "wrong-password feedback",
+      "staff sign-in",
+      "sample I99001 lookup",
+      "renewal 200 baht",
+      "redemption 10200 baht",
+      "staff sign-out",
+      "protected route redirects to sign-in",
+      "public sample lookup"
+    ],
+    "physicalDeviceSafariCameraPrinterOffline": "unverified"
+  },
+  "preserved": [
+    "production credentials and data",
+    "calculator UI and financial engine",
+    "live writer ownership",
+    "main and hosting settings"
+  ],
+  "remaining": [
+    "eligible separate hosted test database and website",
+    "relevant physical setup checks",
+    "owner acceptance",
+    "development integration"
+  ],
+  "publicCIReference": {
+    "head": "6dceeb43ec5c6e35bcd6406daf0fb2abb03d1f8a",
+    "run": 40743216730,
+    "result": "success; final checkpoint run verified separately"
+  }
+}

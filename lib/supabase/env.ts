@@ -1,3 +1,5 @@
+import { assertLocalTestUrl } from "@/lib/local-test-config"
+
 export interface SupabasePublicEnv {
     url: string
     anonKey: string
@@ -19,6 +21,10 @@ export interface LineEnv {
 export function getSupabasePublicEnv(): SupabasePublicEnv | null {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()
     const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim()
+
+    if (url) {
+        assertLocalTestUrl(url)
+    }
 
     if (!url || !anonKey) {
         return null
@@ -42,6 +48,7 @@ export function getSupabaseServiceEnv(): SupabaseServiceEnv | null {
 }
 
 export function getInternalSyncSecret(): string | null {
+    if (process.env.NEXT_PUBLIC_BUNCHAI_ENVIRONMENT === "local-test") return null
     const secret = process.env.INTERNAL_SYNC_SECRET?.trim()
     return secret || null
 }
@@ -51,10 +58,12 @@ export function getAppBaseUrl(): string {
 }
 
 export function arePaymentsEnabled(): boolean {
+    if (process.env.NEXT_PUBLIC_BUNCHAI_ENVIRONMENT === "local-test") return false
     return process.env.PAYMENTS_ENABLED?.trim().toLowerCase() === "true"
 }
 
 export function getOmiseEnv(): OmiseEnv | null {
+    if (process.env.NEXT_PUBLIC_BUNCHAI_ENVIRONMENT === "local-test") return null
     const secretKey = process.env.OMISE_SECRET_KEY?.trim()
 
     if (!secretKey) {
@@ -67,6 +76,7 @@ export function getOmiseEnv(): OmiseEnv | null {
 }
 
 export function getLineEnv(): LineEnv | null {
+    if (process.env.NEXT_PUBLIC_BUNCHAI_ENVIRONMENT === "local-test") return null
     const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim()
     const groupId = process.env.LINE_GROUP_ID?.trim()
 

@@ -1,0 +1,78 @@
+{
+  "date": "2026-10-28",
+  "timezone": "Asia/Bangkok",
+  "status": "local verification passed; B01 partial, owner acceptance pending",
+  "source_baseline": "bc041a1cd2b864ca9afe261a0bcc7f290dd91b07",
+  "branch": "codex/b01-isolated-environment",
+  "local_project": "bunchai-b01-local",
+  "local_network": "bunchai-b01-loopback",
+  "application_url": "http://127.0.0.1:3000",
+  "hosted_project_link": false,
+  "paid_resource_created": false,
+  "remote_push": false,
+  "tools": {
+    "supabase_cli": "2.118.0",
+    "docker": "29.6.1",
+    "node": "26.0.0",
+    "npm": "11.12.1"
+  },
+  "tests": {
+    "passed": 81,
+    "total": 83,
+    "known_unchanged_failures": [
+      "ManualCalculator renders locked prefilled fields for staff lookup mode",
+      "ManualCalculator marks archived staff records clearly"
+    ]
+  },
+  "build": "passed including TypeScript",
+  "isolation_cases": "15 focused cases passed across local config and env helper tests",
+  "browser_lookup": {
+    "sample_pawn": "I99001",
+    "principal": 10000,
+    "rate": 0.02,
+    "displayed_interest": 200,
+    "passed_before_and_after_restore": true
+  },
+  "recovery": {
+    "public_schema_export": true,
+    "public_data_export": true,
+    "reset_local_no_seed": true,
+    "trace_read_after_restore": true,
+    "pawn_count": 1,
+    "private_file_hash_matches": true,
+    "private_file_sha256": "e1cc1f5f627aa85496645024dab1e2cc23e8fe1c828ccf913d85e0c8c4ed64ff"
+  },
+  "anonymous_direct_table_read": "denied",
+  "published_port_bindings": "127.0.0.1 only",
+  "built_app_requests": {
+    "sample_lookup": 200,
+    "payment_creation_disabled": 404,
+    "legacy_sync_disabled": 503,
+    "omise_webhook_disabled": 503
+  },
+  "legacy_calculator": {
+    "public": 200,
+    "staff": 307,
+    "staff_redirect": "/staff/sign-in",
+    "checked_at": "2026-10-28 19:32 Asia/Bangkok"
+  },
+  "limitations": [
+    "No hosted test deployment",
+    "No staff sign-in/device or tablet/browser acceptance",
+    "Legacy local schema policies are not replacement-platform authorization acceptance",
+    "No production restore or post-cutover transaction recovery claimed",
+    "B01 feature publication/draft PR pending exact public-payload approval; engineering setup, parent issue and guarded integration branch exist"
+  ],
+  "snapshot_note": "Original local rehearsal snapshot; subsequent Git/publication state is recorded in b01-git-review-path.md.",
+  "additional_runtime_verification": {
+    "node": "24.22.1",
+    "build_with_typescript": "passed",
+    "tests_passed": 81,
+    "tests_total": 83,
+    "same_baseline_failures": true,
+    "local_page_and_sample_lookup": "passed",
+    "restored_trace_file_hash_and_anonymous_denial": "passed",
+    "legacy_public_status": 200,
+    "legacy_staff_status": 307
+  }
+}

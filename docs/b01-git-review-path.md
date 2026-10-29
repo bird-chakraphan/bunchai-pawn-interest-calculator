@@ -1,0 +1,68 @@
+# B01 Git and deployment review path
+
+## Owner acceptance — 29 October 2026
+
+The owner completed the local review and explicitly accepted **B01 local environment readiness**, deferred hosted setup, and authorized PR #14 integration into `codex/bunchai-integration`:
+
+> Everything works as expected. B01 local review passed; defer hosted setup. Please integrate PR #14 into the development branch and finish B01.
+
+This is the approved amendment to the original hosted-website completion target. Local technical verification and owner review have passed; development integration is authorized and its actual result will be recorded in the canonical completion audit. Hosted deployment, physical-device/camera/printer/offline trials, target shop permissions and production recovery remain later gates; they have not passed through this amendment. B02/B03 are not started. Keep the production calculator, existing database, Google Sheet sync, main branch and live links unchanged. No new cloud project, Vercel trial, payment method or paid service is authorized.
+
+Earlier pending/blocked statements below are dated history and are superseded by this acceptance.
+
+28 October 2026. The owner-approved engineering setup is applied and batch issue #13 is open. The guarded integration branch now exists; the owner explicitly approved the reviewed upload and [draft PR #14](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/pull/14) is open against codex/bunchai-integration, unmerged.
+
+
+## Latest checkpoint — 29 October
+
+The owner authorized an unattended B01-only queue after initial publication. Current verified source checkpoint is `71c436a595d1481e394bc6e8ed62a99d22ca6939`, tree `859815b7385bd08e1d6c9304931efc316fd5bd00`. [CI run 40746556833](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/actions/runs/40746556833) passed 94 tests in each of UTC/Bangkok, TypeScript and build. A duplicate push run was cancelled by expected concurrency. The stale UI-test assertions were repaired against actual behavior; no calculator component or engine changed. Local startup/Auth/recovery hardening and post-recovery browser checks are detailed in [the overnight report](b01-overnight-2026-10-29.md).
+
+PR #14 remains open, draft, unmerged and conflict-free against `codex/bunchai-integration`. Main and the live deployment remain at bc041a1; no new legacy deployment was listed. The historical zero-check result and two failing tests below describe the initial checkpoint, not current results. The setup, portable packet, parent issue and draft PR steps below are completed; hosted test resources, relevant physical checks, owner acceptance and integration are pending. No branch-protection requirement is claimed from the presence of a successful workflow; integration remains a manual review gate.
+
+## Verified baseline
+
+- Existing remote branches: `main` at `bc041a1cd2b864ca9afe261a0bcc7f290dd91b07` and `codex/jewelry-staff-foundation` at `a0799af0e936a7cf87dc3ceb575a03b3ea09fe23`, both unprotected.
+- The live calculator uses `main`. Its legacy Preview and Production scopes share sensitive environment-variable names; values have not been read/copied.
+- GitHub connector access works. Local `gh` authentication remains invalid; prefer the connector where sufficient.
+- Existing labels include `ready-for-agent` and `wontfix`. The proposed `needs-triage`, `needs-info` and `ready-for-human` labels are absent. Preserve the existing labels; create missing role labels only when the setup review is resolved.
+
+## Branch safeguard
+
+`vercel.json` disables automatic Git deployments for the existing local `codex/b01-isolated-environment` branch and the new development namespace `codex/bunchai-*`. The proposed integration branch is `codex/bunchai-integration`; future replacement-platform feature branches can use the same namespace.
+
+Unspecified branches retain Vercel's default behavior, so this file does not select a different behavior for `main` or the older jewelry branch. No legacy dashboard settings, deployed files, aliases or credentials have changed.
+
+The local app's build/runtime guards separately reject hosted database URLs. This protects against using inherited production connections even if a build is attempted outside the intended Git path.
+
+Vercel applies repository configuration to connected projects, so these Git-deployment rules also apply to a future new-platform project using these branches. That project's test deployment must use a separately reviewed manual/API path initially, or explicitly revisit the branch policy after test-only connections are verified. No hosted deployment is cleared by this file.
+
+Source: [Vercel Git configuration](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled), read 28 October. Remote behavior must still be checked after the guarded branch is published; a local JSON check alone is not evidence that the remote platform skipped a deployment.
+
+## Next review steps
+
+1. Finish the required engineering-skill setup review and apply the agreed root instruction file and `docs/agents/` configuration.
+2. Package a portable B01 packet and governing-document source map for this public repository, excluding private records, credentials and backups.
+3. Create the B01 parent issue with the verified local results, remaining hosted/owner-review gates and a useful checklist. Keep it open while incomplete.
+4. The integration branch was established at `c35f03440dcbcd9114a1daf70202dffff3da5ac7`, with only the safeguard added to live/main. Publish B01 with the safeguard present and verify no unintended legacy deployment was triggered.
+5. Open a draft PR to the development integration branch. Keep the live `main` branch unchanged. Record actual remote revisions and check results; do not invent a green CI status or hide the two known UI test failures.
+6. Integrate only after the applicable review/acceptance conditions are met. B01 still requires an eligible hosted test-site path and final owner acceptance.
+
+## Applied setup checkpoint
+
+AGENTS.md and docs/agents/ are applied after owner approval. [Issue #13](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/issues/13) is the open parent. Standard role mappings are configured; the three missing role labels are not needed for this in-progress parent and have not been created. The existing enhancement label is used. Full shop business rules are not published; the portable B01 scope/source map and glossary extract define this review boundary.
+
+The GitHub connector publishes reviewed content with the connected account identity. Earlier local commits are retained locally and are not uploaded, avoiding publication of their automatically derived machine email. The remote B01 snapshot commit is based on the guarded integration commit; compare tree contents rather than assuming local and remote commit IDs are identical.
+
+## Remote verification and publication boundary
+
+After creating the integration branch, Vercel still listed only the four existing deployments; the live deployment remains dpl_96XQWXErbKZddZutFP2puFufyYyC from main at bc041a1cd2b864ca9afe261a0bcc7f290dd91b07. Live public/staff entry points returned 200 and 307 to /staff/sign-in. After owner approval, the B01 feature branch and draft PR #14 were created. Initial snapshot commit is 479f8423ccd37d0dd57071031536c54cc0ed569d, tree 3ad060ac9f2b5caa1033f6e5c19e1e68c6e8d7bd, exactly matching the reviewed local tree. Vercel still listed only four old deployments after publication. The first GitHub check read returned zero check runs and zero statuses; the combined API state pending with an empty list is not a running or passed CI job. The PR was draft/open/unmerged and conflict-free when checked.
+
+Automatic approval review rejected the create-tree operation for the 26-file B01 bundle because publishing application code, infrastructure scripts, local schema, operational metadata and test configuration to this public repository requires explicit payload-and-destination approval. No alternate upload path was attempted. The local publication-review manifest and patch are saved in the parent workspace. The owner subsequently explicitly approved this exact publication; the initial snapshot was uploaded through the connector. Main remains unchanged and the PR targets codex/bunchai-integration. The original denial is retained as history, not an outstanding approval request.
+
+## Owner-approved Projects and naming
+
+Bunchai Shop System (https://github.com/users/bird-chakraphan/projects/1) contains #13 in In Progress. Pawn Calculator (https://github.com/users/bird-chakraphan/projects/2) contains all calculator issues #1–#12: eight closed/completed in Done, and four open backlog items #9–#12 in Backlog. Both boards remain private and are linked to this repository. Titles use [SHOP B01] for the current shop batch and [CALC] for existing calculator issues. Future dedicated shared database issues use [SHARED DB] and can belong to both boards. Area labels are not used. Existing descriptions, state/reason and label sets were verified unchanged. This approved issue organization does not approve the separate public code payload.
+
+## Publication checkpoint
+
+The first 26-file snapshot is commit 479f8423ccd37d0dd57071031536c54cc0ed569d. Its immediate follow-up 521fe94 was documentation only. The later owner-authorized B01-only queue added stale-test repairs, CI, an application-URL isolation guard and local setup/Auth/recovery hardening; see the latest checkpoint above. Earlier local history is preserved under codex/b01-local-checkpoints; the working B01 branch is aligned with the connector-created remote history after verifying identical trees. No merge or hosted deployment is authorized by publishing this draft PR.

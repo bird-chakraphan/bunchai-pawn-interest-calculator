@@ -2,6 +2,7 @@ import * as React from "react"
 import { fireEvent, render, screen, within } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { ManualCalculator } from "@/components/manual-calculator"
+import { buildStaffLookupViewModel, type PawnRecord } from "@/lib/staff-lookup"
 
 describe("ManualCalculator", () => {
     beforeEach(() => {
@@ -178,160 +179,79 @@ describe("ManualCalculator", () => {
         expect(screen.getByText("10 ก.ค. 2567")).toBeInTheDocument()
     })
 
-    it("renders locked prefilled fields for staff lookup mode", async () => {
+    it("renders locked prefilled fields for staff lookup mode", () => {
+        const record: PawnRecord = {
+            id: "record-1",
+            pawnId: "P-1001",
+            startDate: "2024-06-10",
+            loanAmount: 10000,
+            promoType: "โปร 2%",
+            baseRate: 0.02,
+            customerPhone: "0000000000",
+            archivedFromSource: false,
+            sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
+            lastSyncedAt: new Date(2024, 6, 10, 17, 0).toISOString(),
+        }
         render(
             <ManualCalculator
-                prefilledRecord={{
-                    pawnId: "P-1001",
-                    startDate: "2024-06-10",
-                    loanAmount: 10000,
-                    promoType: "โปร 2%",
-                    baseRate: 0.02,
-                }}
-                staffLookupViewModel={{
-                    record: {
-                        id: "record-1",
-                        pawnId: "P-1001",
-                        startDate: "2024-06-10",
-                        loanAmount: 10000,
-                        promoType: "โปร 2%",
-                        baseRate: 0.02,
-                        customerPhone: "0812345678",
-                        archivedFromSource: false,
-                        sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
-                        lastSyncedAt: "2024-07-10T10:00:00.000Z",
-                    },
-                    extend: {
-                        transactionType: "ต่อดอก",
-                        result: {
-                            mode: "monthlyPromo",
-                            rate: 0.02,
-                            rateLabel: "2% ต่อเดือน",
-                            method: "ปัดเต็มเดือน โปร 2%",
-                            status: "ภายในระยะเวลา",
-                            interestAmount: 200,
-                            monthCount: 1,
-                            actualMonthCount: 1,
-                            displayedOverdueDays: 0,
-                            latestBoundary: "2024-07-10",
-                            nextBoundary: "2024-08-10",
-                            contractExpiryDate: "2024-09-10",
-                            overdueFromLatestBoundary: 0,
-                            overdueFromContractExpiry: 0,
-                            formulaText: "10,000 × 2% × 1 เดือน",
-                        },
-                    },
-                    redeem: {
-                        transactionType: "ไถ่ของ",
-                        result: {
-                            mode: "monthlyPromo",
-                            rate: 0.02,
-                            rateLabel: "2% ต่อเดือน",
-                            method: "คิดเดือนจริง โปร 2%",
-                            status: "ภายในระยะเวลา",
-                            interestAmount: 200,
-                            monthCount: 1,
-                            actualMonthCount: 1,
-                            displayedOverdueDays: 0,
-                            latestBoundary: "2024-07-10",
-                            nextBoundary: "2024-08-10",
-                            contractExpiryDate: "2024-09-10",
-                            overdueFromLatestBoundary: 0,
-                            overdueFromContractExpiry: 0,
-                            formulaText: "10,000 × 2% × 1 เดือน",
-                        },
-                    },
-                }}
+                prefilledRecord={record}
+                staffLookupViewModel={buildStaffLookupViewModel({ record, currentDate: "2024-07-10" })}
                 title="คำนวณดอกเบี้ยจำนำ รหัส P-1001"
                 showStaffLookupMetadata
             />
         )
 
         expect(screen.getByRole("heading", { name: "คำนวณดอกเบี้ยจำนำ รหัส P-1001" })).toBeInTheDocument()
+        expect(screen.getByText("P-1001")).toBeInTheDocument()
         expect(screen.getByText("10 มิ.ย. 2567")).toBeInTheDocument()
         expect(screen.getByText("10,000 บาท")).toBeInTheDocument()
         expect(screen.getAllByText("โปร 2%").length).toBeGreaterThan(0)
+        // Staff record values stay locked while the action remains selectable.
+        expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+        expect(screen.queryByRole("button", { name: "วันเริ่ม / ต่อดอกล่าสุด" })).not.toBeInTheDocument()
+        expect(screen.queryByRole("radiogroup", { name: "โปรโมชัน" })).not.toBeInTheDocument()
+        expect(screen.getByText("อัพเดทล่าสุด")).toBeInTheDocument()
+        expect(screen.getByText("10 ก.ค. 2567 17:00")).toBeInTheDocument()
         expect(screen.getByText("ดอกเบี้ยที่ต้องชำระในการต่อดอก")).toBeInTheDocument()
-        expect(screen.getByText("สรุปทั้งสองรายการจากข้อมูลใบจำนำ")).toBeInTheDocument()
-        expect(screen.getByText("active")).toBeInTheDocument()
-        expect(screen.getByText("10,200 บาท")).toBeInTheDocument()
-        expect(screen.getByText("sync ล่าสุด")).toBeInTheDocument()
-        expect(screen.getByText("source ล่าสุด")).toBeInTheDocument()
+        expect(screen.getByText("200", { selector: "strong" })).toBeInTheDocument()
+        expect(screen.getByText("10,000 × 2% × 1 เดือน")).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole("radio", { name: "ไถ่ของ" }))
+        expect(screen.getByText("เงินต้นและดอกเบี้ยที่ต้องชำระในการไถ่")).toBeInTheDocument()
+        expect(screen.getByText("10,200", { selector: "strong" })).toBeInTheDocument()
+        expect(screen.getByText("สามารถไถ่ได้")).toBeInTheDocument()
+        expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
     })
 
-    it("marks archived staff records clearly", async () => {
+    it("marks archived staff records clearly", () => {
+        // Beyond the three-month term plus grace, so the real engine blocks redemption.
+        const record: PawnRecord = {
+            id: "record-2",
+            pawnId: "P-2001",
+            startDate: "2024-03-10",
+            loanAmount: 10000,
+            promoType: "โปร 2%",
+            baseRate: 0.02,
+            customerPhone: "0000000000",
+            archivedFromSource: true,
+            sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
+            lastSyncedAt: new Date(2024, 6, 10, 17, 0).toISOString(),
+        }
         render(
             <ManualCalculator
-                prefilledRecord={{
-                    pawnId: "P-2001",
-                    startDate: "2024-06-10",
-                    loanAmount: 10000,
-                    promoType: "โปร 2%",
-                    baseRate: 0.02,
-                }}
-                staffLookupViewModel={{
-                    record: {
-                        id: "record-2",
-                        pawnId: "P-2001",
-                        startDate: "2024-06-10",
-                        loanAmount: 10000,
-                        promoType: "โปร 2%",
-                        baseRate: 0.02,
-                        customerPhone: "0812345678",
-                        archivedFromSource: true,
-                        sourceUpdatedAt: "2024-07-01T10:00:00.000Z",
-                        lastSyncedAt: "2024-07-10T10:00:00.000Z",
-                    },
-                    extend: {
-                        transactionType: "ต่อดอก",
-                        result: {
-                            mode: "monthlyPromo",
-                            rate: 0.02,
-                            rateLabel: "2% ต่อเดือน",
-                            method: "ปัดเต็มเดือน โปร 2%",
-                            status: "ภายในระยะเวลา",
-                            interestAmount: 200,
-                            monthCount: 1,
-                            actualMonthCount: 1,
-                            displayedOverdueDays: 0,
-                            latestBoundary: "2024-07-10",
-                            nextBoundary: "2024-08-10",
-                            contractExpiryDate: "2024-09-10",
-                            overdueFromLatestBoundary: 0,
-                            overdueFromContractExpiry: 0,
-                            formulaText: "10,000 × 2% × 1 เดือน",
-                        },
-                    },
-                    redeem: {
-                        transactionType: "ไถ่ของ",
-                        result: {
-                            mode: "blocked",
-                            rate: 0.03,
-                            rateLabel: "3% ต่อเดือน",
-                            method: "เกินกำหนด 20 วัน",
-                            status: "เกินกำหนดไถ่ของ",
-                            interestAmount: null,
-                            monthCount: 1,
-                            actualMonthCount: 1,
-                            displayedOverdueDays: 0,
-                            latestBoundary: "2024-07-10",
-                            nextBoundary: "2024-08-10",
-                            contractExpiryDate: "2024-09-10",
-                            overdueFromLatestBoundary: 0,
-                            overdueFromContractExpiry: 30,
-                            formulaText: "ไม่สามารถไถ่ได้",
-                            blockedTitle: "ไม่สามารถไถ่ได้",
-                            blockedMessage: "เกินกำหนดไถ่ของ",
-                        },
-                    },
-                }}
+                prefilledRecord={record}
+                staffLookupViewModel={buildStaffLookupViewModel({ record, currentDate: "2024-07-10" })}
                 title="คำนวณดอกเบี้ยจำนำ รหัส P-2001"
                 showStaffLookupMetadata
             />
         )
 
-        expect(screen.getAllByText(/archived_from_source/).length).toBeGreaterThan(0)
-        expect(screen.getByText("สรุปทั้งสองรายการจากข้อมูลใบจำนำ")).toBeInTheDocument()
+        expect(screen.getByText(/จากการ sync ล่าสุด/)).toBeInTheDocument()
+        expect(screen.getByText("สถานะข้อมูล")).toBeInTheDocument()
+        expect(screen.getAllByText("archived_from_source").length).toBeGreaterThan(0)
+        expect(screen.queryByRole("textbox")).not.toBeInTheDocument()
+        fireEvent.click(screen.getByRole("radio", { name: "ไถ่ของ" }))
         expect(screen.getAllByText("ไม่สามารถไถ่ได้").length).toBeGreaterThan(0)
+        expect(screen.queryByText("เงินต้นและดอกเบี้ยที่ต้องชำระในการไถ่")).not.toBeInTheDocument()
     })
 })
