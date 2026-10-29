@@ -1,5 +1,15 @@
 # B01 — source/baseline checkpoint
 
+## Owner acceptance — 29 October 2026
+
+The owner completed the local review and explicitly accepted **B01 local environment readiness**, deferred hosted setup, and authorized PR #14 integration into `codex/bunchai-integration`:
+
+> Everything works as expected. B01 local review passed; defer hosted setup. Please integrate PR #14 into the development branch and finish B01.
+
+This is the approved amendment to the original hosted-website completion target. Local technical verification and owner review have passed; development integration is authorized and its actual result will be recorded in the canonical completion audit. Hosted deployment, physical-device/camera/printer/offline trials, target shop permissions and production recovery remain later gates; they have not passed through this amendment. B02/B03 are not started. Keep the production calculator, existing database, Google Sheet sync, main branch and live links unchanged. No new cloud project, Vercel trial, payment method or paid service is authorized.
+
+Earlier pending/blocked statements below are dated history and are superseded by this acceptance.
+
 **Latest owner decision — 29 October:** continue sample-data testing only in the existing isolated local stack `bunchai-b01-local`. The final shop system and calculator will share the existing paid Supabase project. Do not create another cloud project for now, activate the Vercel trial, add a payment method or change production. An empty Free test organization was created during the earlier approved attempt; no cloud test database/project was provisioned and the organization remains unused. The earlier Free-project proposal is superseded. Hosted test-site readiness and final B01 acceptance remain pending; this decision does not authorize a production connection or complete the batch.
 
 28 October 2026, Asia/Bangkok. **Partial / in progress; not accepted.**

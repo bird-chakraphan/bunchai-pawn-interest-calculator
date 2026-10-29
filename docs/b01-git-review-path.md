@@ -1,5 +1,15 @@
 # B01 Git and deployment review path
 
+## Owner acceptance — 29 October 2026
+
+The owner completed the local review and explicitly accepted **B01 local environment readiness**, deferred hosted setup, and authorized PR #14 integration into `codex/bunchai-integration`:
+
+> Everything works as expected. B01 local review passed; defer hosted setup. Please integrate PR #14 into the development branch and finish B01.
+
+This is the approved amendment to the original hosted-website completion target. Local technical verification and owner review have passed; development integration is authorized and its actual result will be recorded in the canonical completion audit. Hosted deployment, physical-device/camera/printer/offline trials, target shop permissions and production recovery remain later gates; they have not passed through this amendment. B02/B03 are not started. Keep the production calculator, existing database, Google Sheet sync, main branch and live links unchanged. No new cloud project, Vercel trial, payment method or paid service is authorized.
+
+Earlier pending/blocked statements below are dated history and are superseded by this acceptance.
+
 28 October 2026. The owner-approved engineering setup is applied and batch issue #13 is open. The guarded integration branch now exists; the owner explicitly approved the reviewed upload and [draft PR #14](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/pull/14) is open against codex/bunchai-integration, unmerged.
 
 

@@ -8,11 +8,11 @@ Prepare a reproducible development/test environment for the existing application
 
 The current local trial uses the existing calculator, a real local Supabase database and synthetic records. It checks the environment and recovery path. It does not validate every financial rule or implement a replacement calculator.
 
-## Current owner-selected path and proposed acceptance
+## Owner-selected path and accepted completion scope
 
 The owner selected the existing local sample-data database for testing and the existing paid Supabase project for the final calculator/shop system. Do not create another cloud project, activate a Vercel trial or add a payment method. Keep the current live calculator, its database and Google Sheet sync unchanged until the finished shop website's separately authorized cutover. The already-created empty Free test organization remains unused; no test cloud database was provisioned.
 
-The original B01 target included a hosted test website. The latest local-only decision defers that work but has not yet accepted a narrower completion definition. **Recommendation for owner review:** accept B01 as reproducible local test-environment readiness and explicitly carry hosted test deployment/new-platform hosting into a later authorized setup step before trials that require it. Physical tablet/camera/printer/offline acceptance is not established by a local browser viewport. This recommendation is not yet an approved scope amendment or B01 completion.
+The original B01 target included a hosted test website. On 29 October the owner passed the local review, explicitly accepted B01 as reproducible local test-environment readiness, deferred hosted setup, and authorized PR #14 integration into `codex/bunchai-integration`. Hosted test deployment/new-platform hosting remains a later separately authorized setup step before trials that require it. Physical tablet/camera/printer/offline acceptance is not established by a local browser viewport. This is an approved scope amendment; earlier pending recommendations are superseded.
 
 See [the current acceptance packet](b01-review-2026-10-29.md). Technical checks are complete for the selected local environment; no new shop workflow or production release is being accepted here.
 
@@ -30,12 +30,12 @@ See [the current acceptance packet](b01-review-2026-10-29.md). Technical checks 
 | Gate | Required evidence | Current state |
 | --- | --- | --- |
 | Source | Repository, base revision, preserved unrelated work, reproducible checks | Recorded in [progress](b01-progress.md) |
-| Access/targets | Verified GitHub/Vercel/Supabase identities and separate test/live targets | Access verified; local test target selected; hosted test target pending |
+| Access/targets | Verified GitHub/Vercel/Supabase identities and separate test/live targets | Access verified; local test target selected; hosted test target deferred by owner |
 | Isolation | Traceable test write/read; application rejects production targets; external effects disabled | Local checks passed |
 | Recovery | Repeatable isolated database and private-file export/reset/restore | Local rehearsal passed; not production recovery |
-| Website | Reproducible test-connected deployment/access, relevant browser/device checks, existing links | Local owner trial worked; hosted website and device acceptance pending |
-| Review | Portable packet, actual integration/production mapping, visible required checks/failures | Setup applied; draft PR #14 targets guarded development integration; published CI passed |
-| Acceptance | Technical checks, owner demonstration, material feedback resolution, acceptance, development integration and durable checkpoint/handoff | Not accepted or integrated |
+| Website | Reproducible test-connected deployment/access, relevant browser/device checks, existing links | Local owner review passed; hosted setup and physical-device trials deferred |
+| Review | Portable packet, actual integration/production mapping, visible required checks/failures | Setup applied; PR #14 targets guarded development integration; published CI passed |
+| Acceptance | Technical checks, owner demonstration, material feedback resolution, acceptance, development integration and durable checkpoint/handoff | Owner accepted 29 October; development integration authorized, final result in completion audit |
 
 See [the runbook](b01-local-runbook.md), [29 October technical results](b01-local-checks-2026-10-29.json) and [acceptance packet](b01-review-2026-10-29.md). All 94 tests pass in each of UTC/Bangkok; TypeScript and the Node 24.22.1 build passed at the current code checkpoint. The two original UI failures were stale tests and are documented as resolved; no calculator component or financial engine changed. Local synthetic staff sign-in/out and registration denial passed and were refreshed on 29 October, alongside health/isolation, existing recovery-probe verification and a fresh browser lookup. A successful complete local recovery rehearsal is recorded; no new reset was needed for this readback.
 
@@ -43,7 +43,7 @@ Local legacy authenticated read policies do not accept the replacement platform'
 
 ## Review process
 
-Technical verification → owner demonstration/review → resolve material feedback → record acceptance → integrate into the agreed development baseline → durable checkpoint → continuation handoff when needed. A local smoke test or draft PR does not complete B01 or authorize production release. Leave issue #13 open while these conditions remain unmet.
+Technical verification → owner demonstration/review → resolve material feedback → record acceptance → integrate into the agreed development baseline → durable checkpoint → continuation handoff when needed. A local smoke test or draft PR does not complete B01 or authorize production release. Close issue #13 after accepted development integration and final verification; retain the deferred setup and release gates explicitly.
 
 ## Source and limits
 
