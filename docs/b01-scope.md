@@ -1,12 +1,20 @@
 # B01 — isolated environment preparation
 
-28 October 2026, Asia/Bangkok. **In progress; owner acceptance pending.** Parent: [GitHub issue #13](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/issues/13).
+Updated 29 October 2026, Asia/Bangkok. **Local technical checks verified; scope/owner acceptance pending.** Parent: [GitHub issue #13](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/issues/13).
 
 ## Authorized outcome
 
 Prepare a reproducible development/test environment for the existing application, with a test-connected website for later workflow trials. Preserve the existing public and staff calculators, their links and production data. The owner selected sample data first without added paid services. B02 normal-sale design and B03 normal-sale implementation need their own authorization.
 
 The current local trial uses the existing calculator, a real local Supabase database and synthetic records. It checks the environment and recovery path. It does not validate every financial rule or implement a replacement calculator.
+
+## Current owner-selected path and proposed acceptance
+
+The owner selected the existing local sample-data database for testing and the existing paid Supabase project for the final calculator/shop system. Do not create another cloud project, activate a Vercel trial or add a payment method. Keep the current live calculator, its database and Google Sheet sync unchanged until the finished shop website's separately authorized cutover. The already-created empty Free test organization remains unused; no test cloud database was provisioned.
+
+The original B01 target included a hosted test website. The latest local-only decision defers that work but has not yet accepted a narrower completion definition. **Recommendation for owner review:** accept B01 as reproducible local test-environment readiness and explicitly carry hosted test deployment/new-platform hosting into a later authorized setup step before trials that require it. Physical tablet/camera/printer/offline acceptance is not established by a local browser viewport. This recommendation is not yet an approved scope amendment or B01 completion.
+
+See [the current acceptance packet](b01-review-2026-10-29.md). Technical checks are complete for the selected local environment; no new shop workflow or production release is being accepted here.
 
 ## Boundaries
 
@@ -26,10 +34,12 @@ The current local trial uses the existing calculator, a real local Supabase data
 | Isolation | Traceable test write/read; application rejects production targets; external effects disabled | Local checks passed |
 | Recovery | Repeatable isolated database and private-file export/reset/restore | Local rehearsal passed; not production recovery |
 | Website | Reproducible test-connected deployment/access, relevant browser/device checks, existing links | Local owner trial worked; hosted website and device acceptance pending |
-| Review | Portable packet, actual integration/production mapping, visible required checks/failures | Setup applied; GitHub review being established |
+| Review | Portable packet, actual integration/production mapping, visible required checks/failures | Setup applied; draft PR #14 targets guarded development integration; published CI passed |
 | Acceptance | Technical checks, owner demonstration, material feedback resolution, acceptance, development integration and durable checkpoint/handoff | Not accepted or integrated |
 
-See [the runbook](b01-local-runbook.md) and [dated check summary](b01-local-checks-2026-10-28.json) for actual commands/results. The two known baseline UI test failures remain visible. Local legacy authenticated read policies are not approval of the replacement platform's authorization model. Node 24.22.1 build/TypeScript, local lookup and recovery verification passed, with the same two baseline test failures. Staff sign-in, real tablets/printing/offline behavior and production recovery remain unverified.
+See [the runbook](b01-local-runbook.md), [29 October technical results](b01-local-checks-2026-10-29.json) and [acceptance packet](b01-review-2026-10-29.md). All 94 tests pass in each of UTC/Bangkok; TypeScript and the Node 24.22.1 build passed at the current code checkpoint. The two original UI failures were stale tests and are documented as resolved; no calculator component or financial engine changed. Local synthetic staff sign-in/out and registration denial passed and were refreshed on 29 October, alongside health/isolation, existing recovery-probe verification and a fresh browser lookup. A successful complete local recovery rehearsal is recorded; no new reset was needed for this readback.
+
+Local legacy authenticated read policies do not accept the replacement platform's authorization model. Physical tablets/printing/offline behavior and production recovery remain unverified. The earlier 28 October check summary is historical, not the current result.
 
 ## Review process
 

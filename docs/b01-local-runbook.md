@@ -1,5 +1,7 @@
 # B01 local sample-data runbook
 
+**29 October owner confirmation:** this local stack is the selected testing environment. Use the existing paid Supabase project only for the final shared live system after its authorized release gates. Do not provision another cloud test project or activate a Vercel trial for now.
+
 Updated 29 October 2026, Asia/Bangkok. This is an isolated local compatibility trial of the existing calculator. It is not the new sale workflow, a production release or complete B01 acceptance.
 
 ## Verified local environment

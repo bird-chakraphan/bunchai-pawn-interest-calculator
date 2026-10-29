@@ -1,5 +1,7 @@
 # B01 — source/baseline checkpoint
 
+**Latest owner decision — 29 October:** continue sample-data testing only in the existing isolated local stack `bunchai-b01-local`. The final shop system and calculator will share the existing paid Supabase project. Do not create another cloud project for now, activate the Vercel trial, add a payment method or change production. An empty Free test organization was created during the earlier approved attempt; no cloud test database/project was provisioned and the organization remains unused. The earlier Free-project proposal is superseded. Hosted test-site readiness and final B01 acceptance remain pending; this decision does not authorize a production connection or complete the batch.
+
 28 October 2026, Asia/Bangkok. **Partial / in progress; not accepted.**
 
 This is the existing `bird-chakraphan/bunchai-pawn-interest-calculator` repository. B01 uses local branch `codex/b01-isolated-environment`, based on live/main commit `bc041a1cd2b864ca9afe261a0bcc7f290dd91b07`. The sibling older jewelry checkout was preserved. GitHub batch issue #13 is open. The guarded development integration branch is published at c35f03440dcbcd9114a1daf70202dffff3da5ac7. The owner explicitly approved the reviewed public upload. B01 snapshot 479f8423ccd37d0dd57071031536c54cc0ed569d is published on codex/b01-isolated-environment and [draft PR #14](https://github.com/bird-chakraphan/bunchai-pawn-interest-calculator/pull/14) targets development integration; no hosted provisioning or deployment has occurred. Local-only sample-data infrastructure has now been created and verified.
@@ -11,6 +13,11 @@ The local sample-data application is available at `http://127.0.0.1:3000`. The o
 Development-only GitHub CI now checks tests in both timezones, TypeScript and a build with nonfunctional local placeholders; run 40743216730 passed at revision 6dceeb43ec5c6e35bcd6406daf0fb2abb03d1f8a. Local startup/health/recovery commands verify exact unlinked targets/current local keys, withhold command output containing keys and refuse remote Docker/unsafe configuration. The local email-provider setup was repaired while keeping public registration disabled. Synthetic sign-in/out, authenticated sample read, wrong-password rejection and signed-out denial passed. A full local public-data/private-probe recovery command passed after adding service-readiness checks; Auth history/full-media recovery is not claimed.
 
 Browser staff/customer lookup passed after recovery at desktop/tablet-sized widths. Physical device checks, eligible hosted test resources/site, final owner acceptance and development integration remain pending. PR #14 stays draft and targets development integration; no production release is authorized.
+
+
+## Current local acceptance checkpoint
+
+The owner resumed B01 and requested completion on 29 October. Eight services were healthy; the stopped sample app was restarted from its existing local-key build on loopback. Fresh guarded health/Auth/recovery-probe readback and browser sample lookup passed. No reset, calculator change, live data/sync change or new cloud resource was needed. [The acceptance packet](b01-review-2026-10-29.md) presents the concrete local demonstration and recommends explicitly amending B01 to local readiness with hosted setup deferred. The owner has not yet accepted that amendment/result; issue #13 stays open and PR #14 unmerged until acceptance and development integration.
 
 ## Portable review packet
 
